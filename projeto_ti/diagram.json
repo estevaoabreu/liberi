@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb1",
+      "top": -271.3,
+      "left": -25.1,
+      "rotate": 270,
+      "attrs": {}
+    },
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 39, "left": -0.6, "attrs": {} },
+    {
+      "type": "chip-mlx90614",
+      "id": "temp_sensor",
+      "top": -257.2,
+      "left": 217.22,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "chip-max30102",
+      "id": "heart_sensor",
+      "top": -257.2,
+      "left": -70.78,
+      "rotate": 270,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "uno:3.3V", "bb1:tp.1", "red", [ "v28.7", "h-168.6", "v-240", "h67.2" ] ],
+    [ "uno:5V", "bb1:bp.1", "red", [ "v28.7", "h138.2", "v-240", "h-67.2" ] ],
+    [ "uno:GND.2", "bb1:bn.1", "black", [ "v19.1", "h138.3", "v-278.4" ] ],
+    [ "uno:GND.3", "bb1:tn.1", "black", [ "v19.1", "h-216.8", "v-240", "h96" ] ],
+    [ "heart_sensor:VCC", "bb1:tp.2", "red", [ "v0" ] ],
+    [ "heart_sensor:GND", "bb1:tn.3", "black", [ "v0" ] ],
+    [ "temp_sensor:VCC", "bb1:bp.2", "red", [ "v0" ] ],
+    [ "temp_sensor:GND", "bb1:bn.3", "black", [ "v0" ] ],
+    [ "uno:A5", "bb1:1t.e", "blue", [ "v38.3", "h119.5", "v-249.6", "h-249.6" ] ],
+    [ "temp_sensor:SDA", "bb1:6b.j", "violet", [ "h0", "v-30.61", "h28.8", "v268.8" ] ],
+    [ "bb1:1b.i", "bb1:6b.i", "violet", [ "v0" ] ],
+    [ "heart_sensor:SDA", "bb1:6b.h", "violet", [ "h19.2", "v218.99" ] ],
+    [ "bb1:1t.d", "bb1:10t.d", "blue", [ "v0" ] ],
+    [ "temp_sensor:SCL", "bb1:10t.e", "blue", [ "v-30.61", "h-19.2", "v201.6" ] ],
+    [ "heart_sensor:SCL", "bb1:10t.c", "blue", [ "v-21.01", "h48", "v211.2" ] ],
+    [ "uno:A4", "bb1:1b.j", "violet", [ "v67.1", "h90.6", "v-268.8", "h-144" ] ]
+  ],
+  "dependencies": {}
+}

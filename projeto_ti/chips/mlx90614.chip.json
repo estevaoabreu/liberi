@@ -1,0 +1,5 @@
+{
+  "name": "mlx90614",
+  "author": "Custom",
+  "pins": [ "VCC", "GND", "SDA", "SCL" ]
+}

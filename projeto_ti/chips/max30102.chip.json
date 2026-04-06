@@ -1,0 +1,5 @@
+{
+  "name": "max30102",
+  "author": "Custom",
+  "pins": [ "VCC", "GND", "SDA", "SCL" ]
+}
