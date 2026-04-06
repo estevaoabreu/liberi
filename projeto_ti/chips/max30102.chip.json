@@ -1,5 +1,15 @@
 {
   "name": "max30102",
   "author": "Custom",
-  "pins": [ "VCC", "GND", "SDA", "SCL" ]
+  "pins": ["VCC", "GND", "SDA", "SCL"],
+  "controls": [
+    {
+      "id": "condition",
+      "label": "Vitals Condition",
+      "type": "range",
+      "min": 0,
+      "max": 2,
+      "value": 0
+    }
+  ]
 }
