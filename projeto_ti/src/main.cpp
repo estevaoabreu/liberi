@@ -29,22 +29,22 @@ void setup() {
   // Use INPUT_PULLUP so the button doesn't need a resistor
   pinMode(BTN_PIN, INPUT_PULLUP);
 
-  Serial.println("--- INFANT MONITOR INITIALIZED ---");
-  Serial.println("Press Button to Start...");
   setStatusColor(0, 0, 0); // Start OFF
+  Serial.println("SYSTEM_BOOTED");
 }
 
 void loop() {
   // 1. Check Button for Power Toggle
   if (digitalRead(BTN_PIN) == LOW) {
     systemActive = !systemActive;
-    Serial.print("SYSTEM STATUS: ");
-    Serial.println(systemActive ? "ON" : "OFF");
     
     if (!systemActive) {
-      setStatusColor(0, 0, 0); // Turn off LED if system is off
+      setStatusColor(0, 0, 0); // Turn off LED
+      Serial.println("STATUS,OFF");
+    } else {
+      Serial.println("STATUS,ON");
     }
-    delay(500); // Simple debounce to prevent double-toggle
+    delay(500); // Debounce delay
   }
 
   // 2. Only run monitoring if the system is ON
@@ -57,32 +57,36 @@ void loop() {
       int temp = Wire.available() ? Wire.read() : 0;
 
       // Read Vitals from MAX30102 (0x57) 
-      // Since our custom chip alternates SpO2 and Heart Rate, we read twice
+      // We read twice because the custom chip alternates SpO2 and Heart Rate
       Wire.requestFrom(0x57, 1);
       int vital1 = Wire.available() ? Wire.read() : 0;
       delay(50);
       Wire.requestFrom(0x57, 1);
       int vital2 = Wire.available() ? Wire.read() : 0;
 
-      Serial.print("Temp: "); Serial.print(temp);
-      Serial.print(" | Vitals: "); Serial.print(vital1); 
-      Serial.print(" / "); Serial.println(vital2);
+      // --- SEND DATA TO NODE.JS APP ---
+      // Format: DATA,temp,vital1,vital2
+      Serial.print("DATA,");
+      Serial.print(temp);
+      Serial.print(",");
+      Serial.print(vital1);
+      Serial.print(",");
+      Serial.println(vital2);
 
       // --- LOGIC FOR RGB LED STATUS ---
       
       // CRITICAL: Temp >= 40 OR either vital reading < 90 (Critical Heart/Oxygen)
-if (temp >= 40 || vital1 < 60 || vital2 < 60) { 
-    // CRITICAL (Red) if Heart Rate < 60 or Temp > 40
-    setStatusColor(255, 0, 0); 
-} 
-else if (temp >= 38 || vital1 < 90 || vital2 < 90) { 
-    // WARNING (Orange) if Vitals drop below 90
-    setStatusColor(255, 100, 0); 
-} 
-else { 
-    // GREEN (Healthy) - Now 72 and 98 will both fall here!
-    setStatusColor(0, 255, 0); 
-}
+      if (temp >= 40 || (vital1 < 90 && vital1 > 0) || (vital2 < 90 && vital2 > 0)) {
+        setStatusColor(255, 0, 0); // SOLID RED
+      } 
+      // WARNING: Temp 38-39 OR vital reading 90-94
+      else if (temp >= 38 || (vital1 < 95 && vital1 > 0) || (vital2 < 95 && vital2 > 0)) {
+        setStatusColor(255, 100, 0); // ORANGE/YELLOW
+      } 
+      // IDEAL: Temp 36-37 AND Vitals >= 95
+      else {
+        setStatusColor(0, 255, 0); // SOLID GREEN
+      }
     }
   }
 }
