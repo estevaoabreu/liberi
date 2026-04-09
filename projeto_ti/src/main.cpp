@@ -35,36 +35,54 @@ void setup() {
 }
 
 void loop() {
-  byte error;
-  int address;
-
-  // 1. Check MLX90614 (0x5A)
-  Wire.beginTransmission(0x5A);
-  error = Wire.endTransmission(); 
-
-  if (error == 0) {
-    Serial.print("MLX90614 detected! ");
-    Wire.requestFrom(0x5A, 1);
-    if (Wire.available()) {
-      Serial.print("Temp: "); Serial.println(Wire.read());
+  // 1. Check Button for Power Toggle
+  if (digitalRead(BTN_PIN) == LOW) {
+    systemActive = !systemActive;
+    Serial.print("SYSTEM STATUS: ");
+    Serial.println(systemActive ? "ON" : "OFF");
+    
+    if (!systemActive) {
+      setStatusColor(0, 0, 0); // Turn off LED if system is off
     }
-  } else {
-    Serial.println("MLX90614 NOT found. Check SDA/SCL wiring or Chip ID.");
+    delay(500); // Simple debounce to prevent double-toggle
   }
 
-  // 2. Check MAX30102 (0x57)
-  Wire.beginTransmission(0x57);
-  error = Wire.endTransmission();
+  // 2. Only run monitoring if the system is ON
+  if (systemActive) {
+    if (millis() - lastUpdate > 1500) { // Update every 1.5 seconds
+      lastUpdate = millis();
 
-  if (error == 0) {
-    Serial.print("MAX30102 detected! ");
-    Wire.requestFrom(0x57, 1);
-    if (Wire.available()) {
-      Serial.print("Heart: "); Serial.println(Wire.read());
+      // Read Temperature from MLX90614 (0x5A)
+      Wire.requestFrom(0x5A, 1);
+      int temp = Wire.available() ? Wire.read() : 0;
+
+      // Read Vitals from MAX30102 (0x57) 
+      // Since our custom chip alternates SpO2 and Heart Rate, we read twice
+      Wire.requestFrom(0x57, 1);
+      int vital1 = Wire.available() ? Wire.read() : 0;
+      delay(50);
+      Wire.requestFrom(0x57, 1);
+      int vital2 = Wire.available() ? Wire.read() : 0;
+
+      Serial.print("Temp: "); Serial.print(temp);
+      Serial.print(" | Vitals: "); Serial.print(vital1); 
+      Serial.print(" / "); Serial.println(vital2);
+
+      // --- LOGIC FOR RGB LED STATUS ---
+      
+      // CRITICAL: Temp >= 40 OR either vital reading < 90 (Critical Heart/Oxygen)
+if (temp >= 40 || vital1 < 60 || vital2 < 60) { 
+    // CRITICAL (Red) if Heart Rate < 60 or Temp > 40
+    setStatusColor(255, 0, 0); 
+} 
+else if (temp >= 38 || vital1 < 90 || vital2 < 90) { 
+    // WARNING (Orange) if Vitals drop below 90
+    setStatusColor(255, 100, 0); 
+} 
+else { 
+    // GREEN (Healthy) - Now 72 and 98 will both fall here!
+    setStatusColor(0, 255, 0); 
+}
     }
-  } else {
-    Serial.println("MAX30102 NOT found. Check SDA/SCL wiring or Chip ID.");
   }
-
-  delay(2000);
 }
