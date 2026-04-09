@@ -26,6 +26,22 @@
       "left": -70.78,
       "rotate": 270,
       "attrs": {}
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "rgb1",
+      "top": -244.8,
+      "left": 111.3,
+      "rotate": 90,
+      "attrs": { "common": "cathode" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -294.2,
+      "left": 105.8,
+      "rotate": 180,
+      "attrs": { "color": "green", "xray": "1" }
     }
   ],
   "connections": [
@@ -44,7 +60,21 @@
     [ "bb1:1t.d", "bb1:10t.d", "blue", [ "v0" ] ],
     [ "temp_sensor:SCL", "bb1:10t.e", "blue", [ "v-30.61", "h-19.2", "v201.6" ] ],
     [ "heart_sensor:SCL", "bb1:10t.c", "blue", [ "v-21.01", "h48", "v211.2" ] ],
-    [ "uno:A4", "bb1:1b.j", "violet", [ "v67.1", "h90.6", "v-268.8", "h-144" ] ]
+    [ "uno:A4", "bb1:1b.j", "violet", [ "v67.1", "h90.6", "v-268.8", "h-144" ] ],
+    [ "bb1:tn.22", "bb1:27t.a", "black", [ "h0" ] ],
+    [ "uno:9", "bb1:21t.a", "magenta", [ "v-19.2", "h-143.2", "v-220.8" ] ],
+    [ "bb1:20t.a", "bb1:tn.16", "black", [ "h0" ] ],
+    [ "uno:10", "bb1:19t.a", "limegreen", [ "v-48", "h-114.5", "v-192" ] ],
+    [ "uno:11", "bb1:18t.a", "cyan", [ "v-38.4", "h-143.4", "v-201.6" ] ],
+    [ "uno:2", "bb1:25b.j", "gold", [ "v-38.4", "h23.3", "v-192", "h-19.2", "v-76.8" ] ],
+    [ "btn1:1.l", "bb1:25b.h", "", [ "$bb" ] ],
+    [ "btn1:2.l", "bb1:27b.h", "", [ "$bb" ] ],
+    [ "btn1:1.r", "bb1:25t.c", "", [ "$bb" ] ],
+    [ "btn1:2.r", "bb1:27t.c", "", [ "$bb" ] ],
+    [ "rgb1:R", "bb1:21t.e", "", [ "$bb" ] ],
+    [ "rgb1:COM", "bb1:20t.d", "", [ "$bb" ] ],
+    [ "rgb1:G", "bb1:19t.e", "", [ "$bb" ] ],
+    [ "rgb1:B", "bb1:18t.e", "", [ "$bb" ] ]
   ],
   "dependencies": {}
 }
