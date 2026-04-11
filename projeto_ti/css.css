@@ -11,9 +11,6 @@ body {
     width: 100vw;
     margin: 0;
     padding: 0;
-    background:
-        radial-gradient(ellipse at top, #d0d0d0, transparent),
-        radial-gradient(ellipse at bottom, #73ff00, transparent);
 
     h1 {
         font-size: 5em;
@@ -21,13 +18,24 @@ body {
     }
 
     h2 {
-        font-size: 8em;
-        margin-top: 20vh;
+        font-size: 6em;
         font-weight: 200;
     }
 
     p {
         font-size: 1em;
         margin-top: -8vh;
+    }
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 5vh;
+
+    div {
+        width: 30%;
+        flex-shrink: 1;
     }
 }
