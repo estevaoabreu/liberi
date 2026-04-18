@@ -31,7 +31,7 @@
       "type": "wokwi-rgb-led",
       "id": "rgb1",
       "top": -244.8,
-      "left": 111.3,
+      "left": 159.3,
       "rotate": 90,
       "attrs": { "common": "cathode" }
     },
@@ -42,6 +42,27 @@
       "left": 105.8,
       "rotate": 180,
       "attrs": { "color": "green", "xray": "1" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -226.45,
+      "left": 96,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -207.25,
+      "left": 96,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": -197.65,
+      "left": 96,
+      "attrs": { "value": "220" }
     }
   ],
   "connections": [
@@ -71,10 +92,17 @@
     [ "btn1:2.l", "bb1:27b.h", "", [ "$bb" ] ],
     [ "btn1:1.r", "bb1:25t.c", "", [ "$bb" ] ],
     [ "btn1:2.r", "bb1:27t.c", "", [ "$bb" ] ],
-    [ "rgb1:R", "bb1:21t.e", "", [ "$bb" ] ],
-    [ "rgb1:COM", "bb1:20t.d", "", [ "$bb" ] ],
-    [ "rgb1:G", "bb1:19t.e", "", [ "$bb" ] ],
-    [ "rgb1:B", "bb1:18t.e", "", [ "$bb" ] ]
+    [ "r2:1", "bb1:19t.b", "", [ "$bb" ] ],
+    [ "r2:2", "bb1:19b.f", "", [ "$bb" ] ],
+    [ "r3:1", "bb1:18t.b", "", [ "$bb" ] ],
+    [ "r3:2", "bb1:18b.f", "", [ "$bb" ] ],
+    [ "r1:1", "bb1:21t.b", "", [ "$bb" ] ],
+    [ "r1:2", "bb1:21b.f", "", [ "$bb" ] ],
+    [ "bb1:20t.e", "bb1:20b.f", "black", [ "h0" ] ],
+    [ "rgb1:R", "bb1:21b.h", "", [ "$bb" ] ],
+    [ "rgb1:COM", "bb1:20b.g", "", [ "$bb" ] ],
+    [ "rgb1:G", "bb1:19b.h", "", [ "$bb" ] ],
+    [ "rgb1:B", "bb1:18b.h", "", [ "$bb" ] ]
   ],
   "dependencies": {}
 }
