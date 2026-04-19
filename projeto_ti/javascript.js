@@ -50,7 +50,7 @@ eventSource.onmessage = function (event) {
           oxygen.textContent = 'N/A';
         }
 
-        if (sensorData.heartrate > 160 || sensorData.heartrate < 80 || sensorData.temp > 38 || sensorData.oxygen < 92) {
+        if (sensorData.heartrate > 150 || sensorData.heartrate < 90 || sensorData.temp > 38 || sensorData.temp < 35 || sensorData.oxygen < 92) {
           pageBody.style.background = `
     radial-gradient(ellipse at top, #d0d0d0, transparent),
     radial-gradient(ellipse at bottom, #fd0000, transparent)
