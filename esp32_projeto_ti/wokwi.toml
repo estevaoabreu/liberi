@@ -1,0 +1,11 @@
+[wokwi]
+version = 1
+firmware = '.pio/build/esp32doit-devkit-v1/firmware.elf'
+
+[[chip]]
+name = 'mlx90614'
+binary = 'chips/mlx90614.chip.wasm'
+
+[[chip]]
+name = 'max30102'
+binary = 'chips/max30102.chip.wasm'
