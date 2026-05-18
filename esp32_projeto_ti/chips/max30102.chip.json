@@ -5,10 +5,10 @@
   "controls": [
     {
       "id": "condition",
-      "label": "Vitals Condition",
+      "label": "Vitals Condition (0=Healthy, 1=Stressed, 2=Critical, 3=Bradycardia, 4=PoorCirc)",
       "type": "range",
       "min": 0,
-      "max": 2,
+      "max": 4,
       "value": 0
     }
   ]

@@ -5,10 +5,10 @@
   "controls": [
     {
       "id": "mode",
-      "label": "Temp State",
+      "label": "Temp State (0=Normal, 1=MildFever, 2=HighFever, 3=MildHypo, 4=SevereHypo)",
       "type": "range",
       "min": 0,
-      "max": 2,
+      "max": 4,
       "value": 0
     }
   ]

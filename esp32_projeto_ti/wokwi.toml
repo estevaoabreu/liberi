@@ -1,6 +1,8 @@
 [wokwi]
 version = 1
 firmware = '.pio/build/esp32doit-devkit-v1/firmware.elf'
+gdbServerPort = 4000
+rfc2217ServerPort = 4001
 
 [[chip]]
 name = 'mlx90614'
