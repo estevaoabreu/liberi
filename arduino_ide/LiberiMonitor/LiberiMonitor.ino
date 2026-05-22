@@ -14,8 +14,8 @@
 #include <esp_bt.h>
 
 // ── Wi‑Fi ───────────────────────────────────────────────────────────────────
-const char* ssid     = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+const char* ssid     = "Vodafone-3CB600";
+const char* password = "tRMjEWFaWVcujx4m";
 const char* ap_ssid  = "LiberiMonitor";
 const char* ap_pass  = "12345678";
 
@@ -208,11 +208,14 @@ SystemState applyHysteresis(SystemState newState) {
   }
 }
 
+#include "index_html.h"
+
 // ────────────────────────────────────────────────────────────────────────────
 //  Setup
 // ────────────────────────────────────────────────────────────────────────────
 void setup() {
   Serial.begin(115200);
+  delay(1500); // Give Serial Monitor time to connect after reset
 
   // Disable Bluetooth (safe, no deinit needed)
   btStop();
@@ -270,14 +273,23 @@ void setup() {
   dataMutex = xSemaphoreCreateMutex();
 
   // LittleFS – holds the web dashboard (index.html, css.css, javascript.js)
-  if (!LittleFS.begin(true)) {
-    Serial.println("LittleFS Mount Failed – did you upload the data folder?");
-    return;
+  bool fsMounted = LittleFS.begin(true);
+  if (!fsMounted) {
+    Serial.println("LittleFS Mount Failed – serving dashboard from memory.");
+  } else {
+    Serial.println("LittleFS mounted.");
+    // Serve static files if they are present on flash
+    server.serveStatic("/", LittleFS, "/");
   }
-  Serial.println("LittleFS mounted.");
 
-  // Serve static files, SSE endpoint
-  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  // Fallback / default direct serving of web dashboard from memory
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/html", index_html);
+  });
+  server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/html", index_html);
+  });
+
   events.onConnect([](AsyncEventSourceClient *client){
     client->send("SYSTEM_BOOTED", NULL, millis());
   });
@@ -310,10 +322,24 @@ void loop() {
       hrBPM = 0; spo2Pct = 0; tempC = 0; pi = 0;
       currentState = STATE_IDLE;
       Serial.println("STATUS,OFF");
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP().toString());
+      } else {
+        Serial.print("AP IP: ");
+        Serial.println(WiFi.softAPIP().toString());
+      }
       events.send("STATUS,OFF");
       particleSensor.shutDown();
     } else {
       Serial.println("STATUS,ON");
+      if (WiFi.status() == WL_CONNECTED) {
+        Serial.print("IP: ");
+        Serial.println(WiFi.localIP().toString());
+      } else {
+        Serial.print("AP IP: ");
+        Serial.println(WiFi.softAPIP().toString());
+      }
       events.send("STATUS,ON");
       particleSensor.wakeUp();
     }
