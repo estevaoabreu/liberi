@@ -129,3 +129,61 @@ async function connectSerial() {
 }
 
 connectBtn.addEventListener("click", connectSerial);
+
+// Automatically connect to Server-Sent Events from the local Node.js server
+const statusDiv = document.createElement("div");
+statusDiv.id = "status";
+statusDiv.className = "status-container";
+statusDiv.textContent = "System: CONNECTING WIRELESSLY...";
+statusDiv.style.marginTop = "15px";
+statusDiv.style.fontWeight = "bold";
+statusDiv.style.color = "#555";
+connectBtn.parentNode.appendChild(statusDiv);
+
+const source = new EventSource('/events');
+
+source.onopen = function() {
+  statusDiv.textContent = "System: CONNECTED WIRELESSLY";
+  statusDiv.style.color = "green";
+};
+
+source.onerror = function() {
+  statusDiv.textContent = "System: DISCONNECTED (Retrying...)";
+  statusDiv.style.color = "red";
+};
+
+source.onmessage = function(event) {
+  let data = event.data;
+  
+  // If the data is JSON-formatted (e.g. from the Wokwi/serial bridge), parse it.
+  if (data.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.content) {
+        data = parsed.content;
+      } else if (parsed.message) {
+        console.log("Server Message:", parsed.message);
+        return;
+      }
+    } catch (e) {
+      console.error("Error parsing JSON EventSource data:", e);
+    }
+  }
+
+  if (data === "STATUS,OFF") {
+    statusDiv.textContent = "System: IDLE (OFF)";
+    statusDiv.style.color = "gray";
+    temperature.textContent = "--";
+    heartrate.textContent = "--";
+    oxygen.textContent = "--";
+    pageBody.style.background = `
+      radial-gradient(ellipse at top, #d0d0d0, transparent),
+      radial-gradient(ellipse at bottom, #73ff00, transparent)
+    `;
+  } else if (data === "STATUS,ON") {
+    statusDiv.textContent = "System: ACTIVE";
+    statusDiv.style.color = "green";
+  } else {
+    updateUI(data);
+  }
+};

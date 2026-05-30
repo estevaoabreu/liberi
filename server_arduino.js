@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 
 const PORT = 3000;
-const SERIAL_PORT = "COM7"; // Change this if your Arduino is on a different port
+const SERIAL_PORT = "COM16"; // Change this if your Arduino is on a different port
 const BAUD_RATE = 115200;
 
 // Set up HTTP Server to serve static files and SSE

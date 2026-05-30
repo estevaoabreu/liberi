@@ -2,9 +2,10 @@
 #include <Wire.h>
 
 #ifdef ESP32
-#include <WiFi.h>
 #include <ESPAsyncWebServer.h>
+#include <HTTPClient.h>
 #include <LittleFS.h>
+#include <WiFi.h>
 #endif
 
 // Pin Definitions
@@ -28,14 +29,21 @@ unsigned long lastUpdate = 0;
 
 // Wi-Fi settings for ESP32 as seen in the setup guide md
 #ifdef ESP32
-const char* ssid     = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
+
+// Address of the Node.js server.
+// Use "10.0.2.2" for Wokwi simulation.
+// For physical devices, change to your PC's local IP address (e.g.
+// "192.168.1.15")
+const char *local_server_host = LOCAL_SERVER_HOST;
+const int local_server_port = 3000;
 
 // Web Server and Event Source
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
 
-#include "index_html.h"
+// No index_html.h inclusion since website is served via LittleFS.
 #endif
 
 // Helper function to set RGB Color
@@ -70,16 +78,18 @@ void setup() {
     Serial.print(".");
     retry++;
   }
-  
+
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("");
     Serial.print("Connected! IP address: ");
     Serial.println(WiFi.localIP());
   } else {
     Serial.println("");
-    Serial.println("Wi-Fi connection failed. Starting fallback Access Point...");
+    Serial.println(
+        "Wi-Fi connection failed. Starting fallback Access Point...");
     WiFi.softAP("LiberiMonitor", "12345678");
-    Serial.print("AP Mode started. Connect to SSID 'LiberiMonitor' with password '12345678'. IP address: ");
+    Serial.print("AP Mode started. Connect to SSID 'LiberiMonitor' with "
+                 "password '12345678'. IP address: ");
     Serial.println(WiFi.softAPIP());
   }
 
@@ -90,15 +100,24 @@ void setup() {
     Serial.println("LittleFS Mounted Successfully");
   }
 
-  // Serve static assets from LittleFS if it mounted successfully
-  server.serveStatic("/", LittleFS, "/");
+  // Serve static assets from LittleFS (including index.html as default)
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
 
-  // Fallback / default direct serving of web dashboard from memory
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", index_html);
+  // Handle root / request manually in case setDefaultFile is bypassed or fails
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (LittleFS.exists("/index.html")) {
+      request->send(LittleFS, "/index.html", "text/html");
+    } else {
+      request->send(404, "text/plain", "index.html not found on LittleFS");
+    }
   });
-  server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", index_html);
+
+  server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (LittleFS.exists("/index.html")) {
+      request->send(LittleFS, "/index.html", "text/html");
+    } else {
+      request->send(404, "text/plain", "index.html not found on LittleFS");
+    }
   });
 
   // Add Event Source endpoint
@@ -127,6 +146,23 @@ void loop() {
         Serial.println(WiFi.softAPIP().toString());
       }
       events.send("STATUS,OFF", "wokwi");
+
+      // Post status change wirelessly to local Node.js server
+      if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        String serverUrl = "http://" + String(local_server_host) + ":" +
+                           String(local_server_port) + "/api/data";
+        http.begin(serverUrl);
+        http.addHeader("Content-Type", "text/plain");
+        int httpResponseCode = http.POST("STATUS,OFF");
+        if (httpResponseCode > 0) {
+          Serial.printf("[HTTP] POST Status Response: %d\n", httpResponseCode);
+        } else {
+          Serial.printf("[HTTP] POST Status failed, error: %s\n",
+                        http.errorToString(httpResponseCode).c_str());
+        }
+        http.end();
+      }
 #endif
     } else {
       Serial.println("STATUS,ON");
@@ -139,6 +175,23 @@ void loop() {
         Serial.println(WiFi.softAPIP().toString());
       }
       events.send("STATUS,ON", "wokwi");
+
+      // Post status change wirelessly to local Node.js server
+      if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        String serverUrl = "http://" + String(local_server_host) + ":" +
+                           String(local_server_port) + "/api/data";
+        http.begin(serverUrl);
+        http.addHeader("Content-Type", "text/plain");
+        int httpResponseCode = http.POST("STATUS,ON");
+        if (httpResponseCode > 0) {
+          Serial.printf("[HTTP] POST Status Response: %d\n", httpResponseCode);
+        } else {
+          Serial.printf("[HTTP] POST Status failed, error: %s\n",
+                        http.errorToString(httpResponseCode).c_str());
+        }
+        http.end();
+      }
 #endif
     }
     delay(500); // Debounce delay
@@ -163,20 +216,41 @@ void loop() {
 
       // --- SEND DATA TO NODE.JS APP & SSE CLIENTS ---
       // Format: DATA,temp,vital1,vital2
-      String payload = "DATA," + String(temp) + "," + String(vital1) + "," + String(vital2);
+      String payload =
+          "DATA," + String(temp) + "," + String(vital1) + "," + String(vital2);
       Serial.println(payload);
 #ifdef ESP32
       events.send(payload.c_str(), "wokwi");
+
+      // Send wirelessly to local Node.js server (localhost)
+      if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        String serverUrl = "http://" + String(local_server_host) + ":" +
+                           String(local_server_port) + "/api/data";
+        http.begin(serverUrl);
+        http.addHeader("Content-Type", "text/plain");
+        int httpResponseCode = http.POST(payload);
+        if (httpResponseCode > 0) {
+          Serial.printf("[HTTP] POST Response: %d\n", httpResponseCode);
+        } else {
+          Serial.printf("[HTTP] POST failed, error: %s\n",
+                        http.errorToString(httpResponseCode).c_str());
+        }
+        http.end();
+      }
 #endif
 
       // --- LOGIC FOR RGB LED STATUS ---
 
-      // CRITICAL: Temp >= 40 OR either vital reading < 90 (Critical Heart/Oxygen)
-      if (temp >= 40 || (vital1 < 90 && vital1 > 0) || (vital2 < 90 && vital2 > 0)) {
+      // CRITICAL: Temp >= 40 OR either vital reading < 90 (Critical
+      // Heart/Oxygen)
+      if (temp >= 40 || (vital1 < 90 && vital1 > 0) ||
+          (vital2 < 90 && vital2 > 0)) {
         setStatusColor(255, 0, 0); // SOLID RED
       }
       // WARNING: Temp 38-39 OR vital reading 90-94
-      else if (temp >= 38 || (vital1 < 95 && vital1 > 0) || (vital2 < 95 && vital2 > 0)) {
+      else if (temp >= 38 || (vital1 < 95 && vital1 > 0) ||
+               (vital2 < 95 && vital2 > 0)) {
         setStatusColor(255, 100, 0); // ORANGE/YELLOW
       }
       // IDEAL: Temp 36-37 AND Vitals >= 95
