@@ -1,48 +1,143 @@
+/* --- Global Styles & Base Typography --- */
 html {
-    font-family: 'Outfit', sans-serif;
-    color: #202020;
+  font-family: "DM Sans", sans-serif;
+  color: #202020;
 }
 
 body {
-    display: block;
-    overflow: hidden;
-    text-align: center;
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-
-    h1 {
-        font-size: 5em;
-        margin-top: 10vh;
-    }
-
-    h2 {
-        font-size: 6em;
-        font-weight: 200;
-    }
-
-    p {
-        font-size: 1em;
-        margin-top: -8vh;
-    }
+  display: block;
+  overflow: hidden;
+  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  /* Hint: You can place your Figma background gradient here */
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(162, 221, 215, 1) 100%
+  );
 }
 
-main {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin-top: 5vh;
-
-    div {
-        width: 30%;
-        flex-shrink: 1;
-    }
+.dm-sans-regular {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
-.status-container {
-    margin-top: 30px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #555;
+/* Base Typography for Onboarding Screens */
+h1 {
+  font-size: 4em;
+  margin-top: 10vh;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 2.2em;
+  font-weight: 400;
+  margin-top: 5vh;
+}
+
+p {
+  font-size: 1.1em;
+  color: #404040;
+}
+
+/* --- SPA Screen Viewport Routing --- */
+/* Hides inactive steps and sets up fullscreen framing */
+.screen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 30px;
+}
+
+/* Instantly shows the step when active */
+.screen.active {
+  display: flex;
+}
+
+/* --- Form & Onboarding Interactive UI --- */
+input,
+select {
+  padding: 12px 24px;
+  margin: 20px 0;
+  border-radius: 25px;
+  border: 1.5px solid #202020;
+  font-family: inherit;
+  font-size: 1.1rem;
+  width: 80%;
+  max-width: 280px;
+  text-align: center;
+  outline: none;
+  background: transparent;
+}
+
+button {
+  padding: 12px 30px;
+  border-radius: 25px;
+  border: 1.5px solid #202020;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: #202020;
+  color: white;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.hint {
+  font-size: 0.9em;
+  opacity: 0.5;
+}
+
+/* --- Dashboard Step Specifics (Merged Layout) --- */
+/* Your original flex layout rule, safely isolated to the metrics area */
+.metrics-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 5vh;
+}
+
+.metric-box {
+  width: 33%;
+  flex-shrink: 1;
+}
+
+/* Scoped variables for your giant Arduino numerical readouts */
+.metric-box h2 {
+  font-size: 3.5em; /* Scaled cleanly for mobile aspect ratios */
+  font-weight: 200;
+  margin: 0;
+}
+
+.metric-box p {
+  font-size: 0.9em;
+  margin-top: 5px; /* Clean spacing to match your target layout */
+}
+
+#connectBtn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

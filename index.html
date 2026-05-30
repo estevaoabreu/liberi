@@ -1,37 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liberi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css.css">
     <script src="libraries/p5.min.js"></script>
 </head>
-
 <body>
-    <h1>Liberi</h1>
+
+    <main class="LoveInteraction">
+        
+        <section id="step-1" class="screen active" onclick="nextStep(2)">
+            <h2>Welcome to</h2>
+            <h1>Liberi</h1>
+            <p class="hint">(Click anywhere to continue)</p>
+        </section>
+
+        <section id="step-2" class="screen" onclick="nextStep(3)">
+            <p>Liberi tracks...</p>
+            <h2>Heart rate</h2>
+            <h2>Temperature</h2>
+            <h2>Oxygen level</h2>
+        </section>
+
+        <section id="step-3" class="screen">
+            <h2>Who are we tracking?</h2>
+            <input type="text" id="babyName" placeholder="Enter your baby's name">
+            <button onclick="nextStep(4)">Next</button>
+        </section>
+
+        <section id="step-4" class="screen">
+            <h2>How old is Tommy?</h2>
+            <select id="babyAge">
+                </select>
+            <p>Health levels differ based on a baby's age</p>
+            <button onclick="nextStep(5)">Next</button>
+        </section>
+
+        <section id="step-5" class="screen">
+            <h2>Do you wish to receive notifications?</h2>
+            <div class="button-group">
+                <button onclick="setNotifications(true)">Yes</button>
+                <button onclick="setNotifications(false)">No</button>
+            </div>
+            <p>Liberi uses notifications to alert you in case your baby's levels are below or above average.</p>
+        </section>
+<section id="step-6" class="screen">
     <div style="margin-bottom: 20px;">
-        <button id="connectBtn" style="padding: 10px 20px; font-family: 'Outfit', sans-serif; font-size: 16px; border: none; border-radius: 8px; background-color: #007bff; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background-color 0.3s;">Connect to ESP32</button>
+        <button id="connectBtn">Connect to ESP32</button>
     </div>
-    <main>
-        <div>
+    
+    <div class="metrics-container">
+        <div class="metric-box">
             <h2 id="temperature">Measuring...</h2>
             <p>Your baby's temperature</p>
         </div>
-        <div>
+        <div class="metric-box">
             <h2 id="heartrate">Measuring...</h2>
             <p>Your baby's heart rate</p>
         </div>
-        <div>
+        <div class="metric-box">
             <h2 id="oxygen">Measuring...</h2>
             <p>Your baby's oxygen level</p>
         </div>
+    </div>
+</section>
+
     </main>
+
     <script src="javascript.js"></script>
 </body>
-
 </html>
