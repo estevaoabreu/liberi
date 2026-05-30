@@ -207,8 +207,8 @@ void loop() {
     maxim_heart_rate_and_oxygen_saturation(irBuffer, BUFFER_SIZE, redBuffer,
                                            &spo2, &validSPO2, &heartRate, &validHeartRate);
 
-    int finalHR = (validHeartRate == 1) ? heartRate : 0;
-    int finalSPO2 = (validSPO2 == 1) ? spo2 : 0;
+    int finalHR = heartRate;
+    int finalSPO2 = spo2;
 
     // 6. Envia a string imediatamente para o Serial (Sem delays longos)
     char sseMsg[128];
@@ -223,11 +223,9 @@ void loop() {
       xTaskCreatePinnedToCore(httpPostTask, "HTTPPostTask", 4096, payloadStr, 1, NULL, 0);
     }
 
-    // 7. Atualização dinâmica dos LEDs baseada na qualidade instantânea
-    if (validSPO2 == 1 && spo2 >= 95 && validHeartRate == 1 && heartRate >= 50 && heartRate <= 130) {
+    // 7. Atualização dinâmica dos LEDs baseada nos valores lidos
+    if (finalSPO2 >= 95 && finalHR >= 50 && finalHR <= 130) {
       setStatusColor(0, 255, 0);  // Verde: Valores bons
-    } else if (finalHR == 0 || finalSPO2 == 0) {
-      setStatusColor(0, 0, 255);  // Mantém azul se estiver a tentar recalcular/sem dedo
     } else {
       setStatusColor(255, 0, 0);  // Vermelho: Valores maus/críticos
     }

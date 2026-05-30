@@ -173,9 +173,9 @@ source.onmessage = function(event) {
   if (data === "STATUS,OFF") {
     statusDiv.textContent = "System: IDLE (OFF)";
     statusDiv.style.color = "gray";
-    temperature.textContent = "--";
-    heartrate.textContent = "--";
-    oxygen.textContent = "--";
+    temperature.textContent = "Off";
+    heartrate.textContent = "Off";
+    oxygen.textContent = "Off";
     pageBody.style.background = `
       radial-gradient(ellipse at top, #d0d0d0, transparent),
       radial-gradient(ellipse at bottom, #73ff00, transparent)

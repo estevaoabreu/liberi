@@ -284,9 +284,9 @@ source.onmessage = function (event) {
   if (data === "STATUS,OFF") {
     statusDiv.textContent = "System: IDLE (OFF)";
     statusDiv.style.color = "gray";
-    temperature.textContent = "--";
-    heartrate.textContent = "--";
-    oxygen.textContent = "--";
+    temperature.textContent = "Off";
+    heartrate.textContent = "Off";
+    oxygen.textContent = "Off";
     
     // Wipe layout configuration tracking classes while idle
     pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
