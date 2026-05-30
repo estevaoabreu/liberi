@@ -139,3 +139,69 @@ button:hover {
     border: none;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+
+/* --- Three-Tier Diagnostic Color Themes --- */
+
+/* Normal (Green Mood) */
+body.state-normal {
+    background: radial-gradient(circle at center, #ffffff 0%, #b2e7a1 100%);
+    color: #1b4314;
+}
+
+/* Abnormal (Yellow/Orange Mood) */
+body.state-abnormal {
+    background: radial-gradient(circle at center, #ffffff 0%, #fbe79a 100%);
+    color: #4a3b05;
+}
+
+/* Concerning (Red Crisis Mood) */
+body.state-concerning {
+    background: radial-gradient(circle at center, #ffffff 0%, #fca2a2 100%);
+    color: #5c0909;
+}
+
+/* --- Dashboard Specific Typography Adjustments --- */
+.status-display-area {
+    margin-top: 4vh;
+}
+
+#statusTitle {
+    font-size: 2.5em;
+    margin: 15px 0 5px 0;
+    font-weight: 700;
+}
+
+#statusDescription {
+    font-size: 1.1em;
+    margin-top: 0;
+    max-width: 320px;
+    display: inline-block;
+    line-height: 1.4;
+}
+
+/* Small helper text style for the top dashboard welcome header */
+#dashboardWelcome {
+    font-size: 1.2em;
+    margin-bottom: 2vh;
+    opacity: 0.85;
+}
+.blob-character {
+    width: 160px;          /* Adjust width to comfortably match your mockup size */
+    height: auto;          /* Keeps the aspect ratio perfectly safe from stretching */
+    margin: 3vh auto 1vh;  /* Creates clean vertical spacing around the character */
+    display: block;        /* Ensures auto margin centers the image horizontally */
+    
+    /* Optional smooth transition animation for when the state changes */
+    transition: transform 0.3s ease; 
+}
+
+/* Subtle pulse animation when the state is concerning to draw immediate attention */
+body.state-concerning .blob-character {
+    animation: gentlePulse 2s infinite ease-in-out;
+}
+
+@keyframes gentlePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}

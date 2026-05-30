@@ -84,47 +84,91 @@ function parseSensorLine(output) {
 
 function updateUI(output) {
     const sensorData = parseSensorLine(output);
-    if (sensorData) {
-        console.log("Parsed Sensor Data:", sensorData);
-
-        if (!isNaN(sensorData.temp)) {
-            temperature.textContent = `${sensorData.temp.toFixed(1)} ºC`;
-        } else {
-            temperature.textContent = "N/A";
-        }
-
-        if (!isNaN(sensorData.heartrate)) {
-            heartrate.textContent = `${sensorData.heartrate} bpm`;
-        } else {
-            heartrate.textContent = "N/A";
-        }
-
-        if (!isNaN(sensorData.oxygen)) {
-            oxygen.textContent = `${sensorData.oxygen} %`;
-        } else {
-            oxygen.textContent = "N/A";
-        }
-
-        // Adaptive Danger/Safe Background State Management
-        if (
-            sensorData.heartrate > 150 ||
-            sensorData.heartrate < 90 ||
-            sensorData.temp > 38 ||
-            sensorData.temp < 35 ||
-            sensorData.oxygen < 92
-        ) {
-            pageBody.style.background = `
-                radial-gradient(ellipse at top, #d0d0d0, transparent),
-                radial-gradient(ellipse at bottom, #fd0000, transparent)
-            `;
-        } else {
-            pageBody.style.background = `
-                radial-gradient(ellipse at top, #d0d0d0, transparent),
-                radial-gradient(ellipse at bottom, #73ff00, transparent)
-            `;
-        }
-    } else {
+    if (!sensorData) {
         console.log("System Status:", output);
+        return;
+    }
+
+    console.log("Parsed Sensor Data:", sensorData);
+
+    // 1. Update the numerical readout values
+    if (!isNaN(sensorData.temp)) {
+        temperature.textContent = `${sensorData.temp.toFixed(1)}ºC`;
+    } else {
+        temperature.textContent = "N/A";
+    }
+
+    if (!isNaN(sensorData.heartrate)) {
+        heartrate.textContent = `${sensorData.heartrate}`; 
+    } else {
+        heartrate.textContent = "N/A";
+    }
+
+    if (!isNaN(sensorData.oxygen)) {
+        oxygen.textContent = `${sensorData.oxygen}%`;
+    } else {
+        oxygen.textContent = "N/A";
+    }
+
+    // 2. Define standard health boundaries
+    const isTempOff = sensorData.temp > 38 || sensorData.temp < 35;
+    const isHeartOff = sensorData.heartrate > 150 || sensorData.heartrate < 90;
+    const isOxygenOff = sensorData.oxygen < 92;
+
+    // Track how many anomalies are happening simultaneously
+    let offCount = 0;
+    let offMetrics = [];
+
+    if (isTempOff) { offCount++; offMetrics.push("temperature"); }
+    if (isHeartOff) { offCount++; offMetrics.push("heart rate"); }
+    if (isOxygenOff) { offCount++; offMetrics.push("oxygen level"); }
+
+    // Grab dynamic UI elements
+    const statusTitle = document.getElementById("statusTitle");
+    const statusDescription = document.getElementById("statusDescription");
+    const dashboardWelcome = document.getElementById("dashboardWelcome");
+    const currentName = appData.babyName || "Tommy";
+
+    // Dynamic Greeting
+    if (dashboardWelcome) {
+        dashboardWelcome.textContent = `${currentName}'s levels are...`;
+    }
+
+    // Reset old state classes from the body element
+    pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
+
+    // 3. State Machine Router (Matches your Figma conditions)
+   // Grab the image element from the DOM
+    const statusBlob = document.getElementById("statusBlob");
+
+    // 3. State Machine Router (Swaps text, backgrounds, AND images)
+    if (offCount === 3) {
+        // CONCERNING STATE: All values are off
+        pageBody.classList.add("state-concerning");
+        if (statusTitle) statusTitle.textContent = "Concerning";
+        if (statusBlob) statusBlob.src = "assets/concerning.svg"; // <-- Change to red sad blob
+        if (statusDescription) {
+            statusDescription.innerHTML = `${currentName}'s levels are <strong>unhealthy</strong>.<br>We advise you to <strong>call emergency services</strong>.`;
+        }
+    } 
+    else if (offCount > 0) {
+        // ABNORMAL STATE: One or two values are off
+        pageBody.classList.add("state-abnormal");
+        if (statusTitle) statusTitle.textContent = "Abnormal";
+        if (statusBlob) statusBlob.src = "assets/abnormal.svg"; // <-- Change to yellow straight face blob
+        if (statusDescription) {
+            let problemList = offMetrics.join(" and ");
+            statusDescription.textContent = `${currentName}'s ${problemList} is currently out of normal standards.`;
+        }
+    } 
+    else {
+        // NORMAL STATE: Everything is perfect
+        pageBody.classList.add("state-normal");
+        if (statusTitle) statusTitle.textContent = "Normal";
+        if (statusBlob) statusBlob.src = "assets/normal.svg"; // <-- Change to green happy blob
+        if (statusDescription) {
+            statusDescription.textContent = `${currentName}'s levels are healthy`;
+        }
     }
 }
 

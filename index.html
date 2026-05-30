@@ -54,21 +54,30 @@
         <button id="connectBtn">Connect to ESP32</button>
     </div>
     
+    <p id="dashboardWelcome" class="hint">Tommy's levels are...</p>
+
     <div class="metrics-container">
         <div class="metric-box">
             <h2 id="temperature">Measuring...</h2>
-            <p>Your baby's temperature</p>
+            <p>Temperature</p>
         </div>
         <div class="metric-box">
             <h2 id="heartrate">Measuring...</h2>
-            <p>Your baby's heart rate</p>
+            <p>Heart rate</p>
         </div>
         <div class="metric-box">
             <h2 id="oxygen">Measuring...</h2>
-            <p>Your baby's oxygen level</p>
+            <p>Oxygen</p>
         </div>
     </div>
-</section>
+
+  <div class="status-display-area">
+    
+    <img id="statusBlob" src="assets/normal.svg" alt="Baby Status Character" class="blob-character">
+    
+    <h3 id="statusTitle">Connecting...</h3>
+    <p id="statusDescription">Please click the button above to pair your monitor device.</p>
+</div>
 
     </main>
 
