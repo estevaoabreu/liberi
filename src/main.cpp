@@ -201,6 +201,7 @@ void loop() {
   if (systemActive) {
     if (millis() - lastUpdate > 1500) { // Update every 1.5 seconds
       lastUpdate = millis();
+      setStatusColor(255, 255, 0); // Yellow: reading values
 
       // Read Temperature from MLX90614 (0x5A)
       Wire.requestFrom(0x5A, 1);
@@ -241,22 +242,7 @@ void loop() {
 #endif
 
       // --- LOGIC FOR RGB LED STATUS ---
-
-      // CRITICAL: Temp >= 40 OR either vital reading < 90 (Critical
-      // Heart/Oxygen)
-      if (temp >= 40 || (vital1 < 90 && vital1 > 0) ||
-          (vital2 < 90 && vital2 > 0)) {
-        setStatusColor(255, 0, 0); // SOLID RED
-      }
-      // WARNING: Temp 38-39 OR vital reading 90-94
-      else if (temp >= 38 || (vital1 < 95 && vital1 > 0) ||
-               (vital2 < 95 && vital2 > 0)) {
-        setStatusColor(255, 100, 0); // ORANGE/YELLOW
-      }
-      // IDEAL: Temp 36-37 AND Vitals >= 95
-      else {
-        setStatusColor(0, 255, 0); // SOLID GREEN
-      }
+      setStatusColor(0, 255, 0); // SOLID GREEN
     }
   }
 }
