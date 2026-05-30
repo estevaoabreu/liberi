@@ -4,9 +4,55 @@ const path = require("path");
 
 const PORT = 3000;
 
-// Set up HTTP Server to serve static files
+// Maintain list of SSE clients (browsers)
+let sseClients = [];
+
+// Set up HTTP Server to serve static files, API endpoint, and SSE
 const server = http.createServer((req, res) => {
-  // Serve static files
+  // 1. Endpoint for ESP32 to POST vital signs data
+  if (req.url === "/api/data" && req.method === "POST") {
+    let body = "";
+    req.on("data", chunk => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      console.log(`[Server] Received from ESP32: ${body}`);
+      
+      // Broadcast this sensor reading to all connected browser dashboards
+      sseClients.forEach(client => {
+        client.write(`data: ${body}\n\n`);
+      });
+      
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end("OK");
+    });
+    return;
+  }
+
+  // 2. Server-Sent Events endpoint for browsers
+  if (req.url === "/events") {
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+      "Access-Control-Allow-Origin": "*",
+    });
+
+    // Send an initial system message
+    res.write("data: STATUS,ON\n\n");
+    sseClients.push(res);
+
+    console.log(`[Server] Browser client connected. Total clients: ${sseClients.length}`);
+
+    // Remove client when it disconnects
+    req.on("close", () => {
+      sseClients = sseClients.filter(client => client !== res);
+      console.log(`[Server] Browser client disconnected. Total clients: ${sseClients.length}`);
+    });
+    return;
+  }
+
+  // 3. Serve static files
   let filePath = "." + req.url;
   if (filePath === "./") {
     filePath = "./index.html";
@@ -51,8 +97,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`\n==============================================`);
   console.log(`Server running at http://localhost:${PORT}/`);
-  console.log(
-    `Open http://localhost:${PORT}/ in your browser to connect to ESP32.`,
-  );
+  console.log(`Accepting wireless ESP32 data POSTs at /api/data`);
+  console.log(`Open http://localhost:${PORT}/ in your browser to view the dashboard.`);
   console.log(`==============================================\n`);
 });
