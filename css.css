@@ -1,4 +1,3 @@
-/* --- Global Styles & Base Typography --- */
 html {
     font-family: 'DM Sans', sans-serif;
     color: #202020;
@@ -12,7 +11,6 @@ body {
     width: 100vw;
     margin: 0;
     padding: 0;
-    /* Hint: You can place your Figma background gradient here */
     background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(162,221,215,1) 100%);
 }
 
@@ -23,7 +21,6 @@ body {
     font-style: normal;
 }
 
-/* Base Typography for Onboarding Screens */
 h1 {
     font-size: 4em;
     margin-top: 10vh;
@@ -42,8 +39,6 @@ p {
 }
 
 
-/* --- SPA Screen Viewport Routing --- */
-/* Hides inactive steps and sets up fullscreen framing */
 .screen {
     display: none;
     width: 100vw;
@@ -55,13 +50,11 @@ p {
     padding: 30px;
 }
 
-/* Instantly shows the step when active */
 .screen.active {
     display: flex;
 }
 
 
-/* --- Form & Onboarding Interactive UI --- */
 input, select {
     padding: 12px 24px;
     margin: 20px 0;
@@ -74,6 +67,32 @@ input, select {
     text-align: center;
     outline: none;
     background: transparent;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    
+    text-align: center;
+    text-align-last: center;
+    
+background-image: url("assets/seta.svg");
+    background-repeat: no-repeat;
+    background-size: 14px;
+    
+    /* 3. Move the arrow away from the border and cushion it 24px into the capsule */
+    background-position: right 24px center;
+    
+    /* 4. Pad the right side so selection text never runs over your new arrow */
+    padding-right: 40px; 
+}
+
+/* Fix for Firefox text centering bug */
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #202020;
 }
 
 button {
@@ -105,8 +124,6 @@ button:hover {
 }
 
 
-/* --- Dashboard Step Specifics (Merged Layout) --- */
-/* Your original flex layout rule, safely isolated to the metrics area */
 .metrics-container {
     display: flex;
     flex-direction: row;
@@ -140,27 +157,25 @@ button:hover {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* --- Three-Tier Diagnostic Color Themes --- */
 
-/* Normal (Green Mood) */
+/* normal */
 body.state-normal {
     background: radial-gradient(circle at center, #ffffff 0%, #b2e7a1 100%);
     color: #1b4314;
 }
 
-/* Abnormal (Yellow/Orange Mood) */
+/* abnormal */
 body.state-abnormal {
     background: radial-gradient(circle at center, #ffffff 0%, #fbe79a 100%);
     color: #4a3b05;
 }
 
-/* Concerning (Red Crisis Mood) */
+/* concerning */
 body.state-concerning {
     background: radial-gradient(circle at center, #ffffff 0%, #fca2a2 100%);
     color: #5c0909;
 }
 
-/* --- Dashboard Specific Typography Adjustments --- */
 .status-display-area {
     margin-top: 4vh;
 }
@@ -179,23 +194,20 @@ body.state-concerning {
     line-height: 1.4;
 }
 
-/* Small helper text style for the top dashboard welcome header */
 #dashboardWelcome {
     font-size: 1.2em;
     margin-bottom: 2vh;
     opacity: 0.85;
 }
 .blob-character {
-    width: 160px;          /* Adjust width to comfortably match your mockup size */
-    height: auto;          /* Keeps the aspect ratio perfectly safe from stretching */
-    margin: 3vh auto 1vh;  /* Creates clean vertical spacing around the character */
-    display: block;        /* Ensures auto margin centers the image horizontally */
-    
-    /* Optional smooth transition animation for when the state changes */
+    width: 160px;          
+    height: auto;        
+    margin: 3vh auto 1vh; 
+    display: block;      
+
     transition: transform 0.3s ease; 
 }
 
-/* Subtle pulse animation when the state is concerning to draw immediate attention */
 body.state-concerning .blob-character {
     animation: gentlePulse 2s infinite ease-in-out;
 }

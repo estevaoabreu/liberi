@@ -1,20 +1,18 @@
-// --- Application State ---
+// estado
 const appData = {
   babyName: "",
   babyAge: 0,
   notificationsEnabled: false,
 };
 
-// --- DOM Elements ---
 const connectBtn = document.getElementById("connectBtn");
 const temperature = document.getElementById("temperature");
 const heartrate = document.getElementById("heartrate");
 const oxygen = document.getElementById("oxygen");
 const pageBody = document.body;
 
-// --- Onboarding & Page Navigation Logic ---
+// onboarding
 
-// Populate the age dropdown (1 to 24 months) automatically when the page loads
 document.addEventListener("DOMContentLoaded", () => {
   const ageSelect = document.getElementById("babyAge");
   if (ageSelect) {
@@ -27,14 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Primary navigation controller
 function nextStep(stepNumber) {
-  // 1. Data Collection Phase before switching views
+  // nome e idade input
   if (stepNumber === 4) {
     const nameInput = document.getElementById("babyName").value.trim();
-    appData.babyName = nameInput || "your baby";
-
-    // Dynamically personalize Step 4 text based on the name input
+    
+    // VALIDATION POP-UP: Check if the name field is empty
+    if (nameInput === "") {
+      alert("Please enter your baby's name before moving on! ❤️");
+      return; // Stops the function right here, preventing the screen change!
+    }
+    
+    appData.babyName = nameInput;
     const ageHeading = document.querySelector("#step-4 h2");
     if (ageHeading) {
       ageHeading.textContent = `How old is ${appData.babyName}?`;
@@ -48,7 +50,7 @@ function nextStep(stepNumber) {
     }
   }
 
-  // 2. View Switching Phase
+  // This part only runs if the validation check passes
   const screens = document.querySelectorAll(".screen");
   screens.forEach((screen) => {
     screen.classList.remove("active");
@@ -60,7 +62,6 @@ function nextStep(stepNumber) {
   }
 }
 
-// Handler for the step 5 notification selections
 function setNotifications(choice) {
   appData.notificationsEnabled = choice;
   console.log("Onboarding complete. Collected Data:", appData);
@@ -88,10 +89,8 @@ function updateUI(output) {
   if (sensorData) {
     console.log("Parsed Sensor Data:", sensorData);
 
-    // Clear any hardcoded inline background style (like from STATUS,OFF) so CSS classes can render
     pageBody.style.background = "";
 
-    // 1. Update the UI text readouts matching your mockup styles
     if (!isNaN(sensorData.temp)) {
       temperature.textContent = `${sensorData.temp.toFixed(1)}ºC`;
     } else {
@@ -238,29 +237,13 @@ if (connectBtn) {
   connectBtn.addEventListener("click", connectSerial);
 }
 
-// --- Wireless Node Server Event Stream Implementation ---
-
-const statusDiv = document.createElement("div");
-statusDiv.id = "status";
-statusDiv.className = "status-container";
-statusDiv.textContent = "System: CONNECTING WIRELESSLY...";
-statusDiv.style.marginTop = "15px";
-statusDiv.style.fontWeight = "bold";
-statusDiv.style.color = "#555";
-if (connectBtn && connectBtn.parentNode) {
-  connectBtn.parentNode.appendChild(statusDiv);
-}
-
 const source = new EventSource("/events");
 
 source.onopen = function () {
-  statusDiv.textContent = "System: CONNECTED WIRELESSLY";
-  statusDiv.style.color = "green";
+
 };
 
 source.onerror = function () {
-  statusDiv.textContent = "System: DISCONNECTED (Retrying...)";
-  statusDiv.style.color = "red";
 };
 
 source.onmessage = function (event) {
@@ -282,22 +265,28 @@ source.onmessage = function (event) {
   }
 
   if (data === "STATUS,OFF") {
-    statusDiv.textContent = "System: IDLE (OFF)";
-    statusDiv.style.color = "gray";
     temperature.textContent = "Off";
     heartrate.textContent = "Off";
     oxygen.textContent = "Off";
     
-    // Wipe layout configuration tracking classes while idle
     pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
+    
+    const statusBlob = document.getElementById("statusBlob");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusDescription = document.getElementById("statusDescription");
+
+    if (statusBlob) statusBlob.src = "assets/happy.svg"; 
+    if (statusTitle) statusTitle.textContent = "Connecting...";
+    if (statusDescription) {
+      statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device."; 
+    }
     
     pageBody.style.background = `
       radial-gradient(ellipse at top, #d0d0d0, transparent),
       radial-gradient(ellipse at bottom, #73ff00, transparent)
     `;
   } else if (data === "STATUS,ON") {
-    statusDiv.textContent = "System: ACTIVE";
-    statusDiv.style.color = "green";
+
   } else {
     updateUI(data);
   }

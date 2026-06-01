@@ -12,7 +12,7 @@
 </head>
 <body>
 
-    <main class="LoveInteraction">
+    <main class="screens">
         
         <section id="step-1" class="screen active" onclick="nextStep(2)">
             <h2>Welcome to</h2>
@@ -29,7 +29,7 @@
 
         <section id="step-3" class="screen">
             <h2>Who are we tracking?</h2>
-            <input type="text" id="babyName" placeholder="Enter your baby's name">
+            <input type="text" id="babyName" placeholder="Please enter your baby's name">
             <button onclick="nextStep(4)">Next</button>
         </section>
 
@@ -50,34 +50,33 @@
             <p>Liberi uses notifications to alert you in case your baby's levels are below or above average.</p>
         </section>
 <section id="step-6" class="screen">
-    <div style="margin-bottom: 20px;">
-        <button id="connectBtn">Connect to ESP32</button>
-    </div>
-    
-    <p id="dashboardWelcome" class="hint">Tommy's levels are...</p>
+    <h3 id="dashboardWelcome">Tommy's levels are...</h3>
 
     <div class="metrics-container">
         <div class="metric-box">
-            <h2 id="temperature">Off</h2>
+            <h2 id="temperature">--</h2>
             <p>Temperature</p>
         </div>
         <div class="metric-box">
-            <h2 id="heartrate">Off</h2>
+            <h2 id="heartrate">--</h2>
             <p>Heart rate</p>
         </div>
         <div class="metric-box">
-            <h2 id="oxygen">Off</h2>
+            <h2 id="oxygen">--</h2>
             <p>Oxygen</p>
         </div>
     </div>
 
-  <div class="status-display-area">
-    
-    <img id="statusBlob" src="assets/normal.svg" alt="Baby Status Character" class="blob-character">
-    
-    <h3 id="statusTitle">Connecting...</h3>
-    <p id="statusDescription">Please click the button above to pair your monitor device.</p>
-</div>
+    <div class="status-display-area">
+        <img id="statusBlob" src="assets/happy.svg" alt="Baby Status Character" class="blob-character">
+        <h3 id="statusTitle">Connecting...</h3>
+        <p id="statusDescription">Please click the button below<br>to pair your monitor device</p>
+    </div>
+
+    <div class="connection-controls" style="margin-top: 4vh;">
+        <button id="connectBtn">Connect to ESP32</button>
+    </div>
+</section>
 
     </main>
 
