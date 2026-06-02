@@ -98,12 +98,12 @@ To view the dashboard, you simply need to open `index.html` in a supported brows
 1. On your PC/Mac, open your OS **Bluetooth Settings** and pair with the device named **`Liberi_Monitor`**.
 2. Once paired, your OS will assign it a virtual serial COM port.
 3. Open the dashboard in Chrome/Edge.
-4. Click the **"Connect to ESP32"** button.
+4. Click the **"Connect to bracelet"** button.
 5. Select the newly created Bluetooth COM port from the browser's pairing dialog to start the wireless stream.
 
 #### Mode B: Wired USB Connection
 
 1. Keep the ESP32 connected to your PC using the USB-C cable.
 2. Open the dashboard in Chrome/Edge.
-3. Click the **"Connect to ESP32"** button.
+3. Click the **"Connect to bracelet"** button.
 4. Select the physical USB COM port assigned to your ESP32 to start the wired stream.

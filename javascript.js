@@ -255,6 +255,7 @@ class LineBreakTransformer {
 async function connectSerial() {
   if ("serial" in navigator) {
     try {
+      connectBtn.textContent = "Connecting...";
       port = await navigator.serial.requestPort();
       await port.open({ baudRate: 115200 });
 
@@ -350,7 +351,7 @@ source.onmessage = function (event) {
     if (connectionControls) connectionControls.style.display = "block";
     if (dashboardFooter) dashboardFooter.style.display = "none";
     if (connectBtn) {
-      connectBtn.textContent = "Connect to ESP32";
+      connectBtn.textContent = "Connect to bracelet";
       connectBtn.style.backgroundColor = "#1B1B1B";
     }
   } else if (data === "STATUS,ON") {
