@@ -30,11 +30,10 @@ h1 {
 h2 {
     font-size: 2.2em;
     font-weight: 400;
-    margin-top: 5vh;
 }
 
 p {
-    font-size: 1.1em;
+    font-size: 1em;
     color: #404040;
 }
 
@@ -56,18 +55,20 @@ p {
 
 
 input, select {
-    padding: 12px 24px;
+    padding: 12px 20px;
     margin: 20px 0;
     border-radius: 25px;
     border: 1.5px solid #202020;
     font-family: inherit;
-    font-size: 1.1rem;
+    font-size: 1rem;
     width: 80%;
     max-width: 280px;
     text-align: center;
     outline: none;
     background: transparent;
 }
+
+
 
 select {
     appearance: none;
@@ -82,21 +83,18 @@ background-image: url("assets/seta.svg");
     background-repeat: no-repeat;
     background-size: 14px;
     
-    /* 3. Move the arrow away from the border and cushion it 24px into the capsule */
     background-position: right 24px center;
     
-    /* 4. Pad the right side so selection text never runs over your new arrow */
     padding-right: 40px; 
 }
 
-/* Fix for Firefox text centering bug */
 select:-moz-focusring {
     color: transparent;
     text-shadow: 0 0 0 #202020;
 }
 
 button {
-    padding: 12px 30px;
+    padding: 12px 20px;
     border-radius: 25px;
     border: 1.5px solid #202020;
     background: transparent;
@@ -138,9 +136,8 @@ button:hover {
     flex-shrink: 1;
 }
 
-/* Scoped variables for your giant Arduino numerical readouts */
 .metric-box h2 {
-    font-size: 3.5em; /* Scaled cleanly for mobile aspect ratios */
+    font-size: 3.5em; 
     font-weight: 200;
     margin: 0;
 }
