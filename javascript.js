@@ -402,26 +402,3 @@ function backToDashboard() {
   const dashboard = document.getElementById("step-6");
   if (dashboard) dashboard.classList.add("active");
 }
-
-function refreshSystem() {
-  console.log("Requesting instant data update from ESP32...");
-  
-  const refreshButton = document.querySelector("button[onclick='refreshSystem()'] img");
-  if (refreshButton) {
-    refreshButton.style.transition = "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
-    refreshButton.style.transform = "rotate(360deg)";
-    
-    setTimeout(() => {
-      refreshButton.style.transition = "none";
-      refreshButton.style.transform = "rotate(0deg)";
-    }, 600);
-  }
-
-  fetch('/refresh') 
-    .then(response => {
-      console.log("Instant poll request successfully processed by system node.");
-    })
-    .catch(error => {
-      console.warn("Could not dispatch refresh signal over network node:", error);
-    });
-}

@@ -9,15 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css.css">
     <script src="libraries/p5.min.js"></script>
+
+  <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.svg" />
 </head>
 <body>
 
     <main class="screens">
         
         <section id="step-1" class="screen active" onclick="nextStep(2)">
-            <h2>Welcome to</h2>
-            <h1>Liberi</h1>
-            <p class="hint">(Click anywhere to continue)</p>
+            <div style="margin-top: 32vh; margin-bottom: auto; text-align: center;">
+                <span style="display: block; font-size: 24px; font-weight: 400; color: #333; margin-bottom: 8px;">Welcome to</span>
+                <img src="assets/logo.svg" alt="Liberi" style="height: 55px; width: auto; max-width: 80%; display: inline-block; pointer-events: none;">
+            </div>
+
+            <p class="hint" style="margin-top: auto; margin-bottom: 4vh; font-size: 14px; color: #333; text-align: center;">
+            Click anywhere to continue
+            </p>
         </section>
 
         <section id="step-2" class="screen" onclick="nextStep(3)">
@@ -75,23 +82,16 @@
     </div>
 
     <div class="connection-controls" style="margin-top: 4vh;">
-        <!-- UPDATED: Changed color to #1B1B1B black and matching pill styling -->
         <button id="connectBtn" style="background-color: #1B1B1B; color: white; border-radius: 25px; padding: 10px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer;">Connect to bracelet</button>
     </div>
 
-    <!-- UPDATED: Set display to none initially so it doesn't show up on the connecting screen -->
     <div class="dashboard-footer" style="display: none; justify-content: center; gap: 40px; margin-top: 4vh; padding-bottom: 2vh;">
-        <!-- Left: Info Button -->
+        <!-- app info -->
         <button onclick="openInfoScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
             <img src="assets/info.svg" alt="Information" style="width: 32px; height: 32px;">
         </button>
         
-        <!-- Middle: Refresh Button -->
-        <button onclick="refreshSystem()" style="background: none; border: none; padding: 0; cursor: pointer;">
-            <img src="assets/refresh.svg" alt="Refresh" style="width: 32px; height: 32px;">
-        </button>
-        
-        <!-- Right: Range/Age Bounds Button -->
+        <!-- age range -->
         <button onclick="openAgeBoundsScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
             <img src="assets/range.svg" alt="Age Ranges" style="width: 32px; height: 32px;">
         </button>
@@ -101,13 +101,13 @@
 
 <section id="info-screen" class="screen" style="padding: 40px 20px; text-align: center;">
     <h2 style="margin-top: 5vh; font-size: 28px;">About Liberi</h2>
-    <div style="margin: 4vh auto; max-width: 85%; text-align: left; line-height: 1.6; font-size: 16px; color: #333;">
+    <div style="margin: 4vh auto; max-width: 85%; text-align: center; line-height: 1.6; font-size: 16px; color: #333;">
         <p><strong>Liberi</strong> is an advanced medical telemetry monitor built to give parents peace of mind.</p>
         <p style="margin-top: 15px;">By reading smart hardware data over Web Serial or wireless nodes, the application constantly evaluates real-time vital signs against safe physiological boundaries.</p>
         <p style="margin-top: 15px;">If readings spike abnormal or concerning, system push notifications will alert you instantly to ensure your child remains completely protected.</p>
     </div>
     <button onclick="backToDashboard()" style="background: none; border: none; cursor: pointer; margin-top: 5vh;">
-        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(180deg);">
+        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(90deg);">
     </button>
 </section>
 
@@ -130,11 +130,13 @@
     </div>
 
     <button onclick="backToDashboard()" style="background: none; border: none; cursor: pointer; margin-top: 8vh;">
-        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px;">
+        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(90deg);">
     </button>
 </section>
+
     </main>
 
     <script src="javascript.js"></script>
+
 </body>
 </html>
