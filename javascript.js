@@ -5,6 +5,9 @@ const appData = {
   notificationsEnabled: false,
 };
 
+let lastNotificationTime = 0;
+let currentAlertState = "normal";
+
 const connectBtn = document.getElementById("connectBtn");
 const temperature = document.getElementById("temperature");
 const heartrate = document.getElementById("heartrate");
@@ -73,6 +76,13 @@ function nextStep(stepNumber) {
 function setNotifications(choice) {
   appData.notificationsEnabled = choice;
   console.log("Onboarding complete. Collected Data:", appData);
+
+  if (choice && "Notification" in window) {
+    Notification.requestPermission().then(permission => {
+      console.log("Notification permission:", permission);
+    });
+  }
+
   nextStep(6); // Forward user directly to dashboard
 }
 
@@ -174,6 +184,32 @@ const connectionControls = document.querySelector(".connection-controls");
         statusDescription.textContent = `${currentName}'s levels are healthy`;
       }
     }
+
+    // --- Web Notifications Logic ---
+    let newState = "normal";
+    let alertMessage = "";
+    if (offCount === 3) {
+      newState = "concerning";
+      alertMessage = `${currentName}'s levels are unhealthy. Please check immediately!`;
+    } else if (offCount > 0) {
+      newState = "abnormal";
+      let problemList = offMetrics.join(" and ");
+      alertMessage = `${currentName}'s ${problemList} is currently out of normal standards.`;
+    }
+
+    if (newState !== "normal" && appData.notificationsEnabled && "Notification" in window && Notification.permission === "granted") {
+      const now = Date.now();
+      // Notify if state just changed to a bad state, OR if it's been in a bad state for more than 2 minutes (120000ms)
+      if (newState !== currentAlertState || (now - lastNotificationTime > 120000)) {
+        new Notification("Liberi Monitor Alert", {
+          body: alertMessage
+        });
+        lastNotificationTime = now;
+      }
+    }
+    
+    currentAlertState = newState;
+
   } else {
     console.log("System Status:", output);
   }
