@@ -173,7 +173,6 @@ function updateUI(output) {
   if (statusBlob) statusBlob.src = "assets/concerning.svg";
   
   if (statusDescription) {
-    // Injects the interactive, underlined text linking directly to the emergency protocol
     statusDescription.innerHTML = `
       ${currentName}'s levels are <strong>unhealthy</strong>.<br>
       We advise you to <a href="tel:112" style="color: inherit; text-decoration: underline; font-weight: bold;">call emergency services</a>.
