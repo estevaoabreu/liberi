@@ -4,7 +4,6 @@ html {
 }
 
 body {
-    display: block;
     overflow: hidden;
     text-align: center;
     height: 100vh;
@@ -14,16 +13,9 @@ body {
     background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(162, 221, 215, 1) 100%);
 }
 
-.dm-sans-regular {
-    font-family: "DM Sans", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-}
-
 h1 {
     font-size: 4em;
-    margin-top: 10vh;
+    margin: 0;
     font-weight: 700;
 }
 
@@ -37,22 +29,20 @@ p {
     color: #404040;
 }
 
-
 .screen {
     display: none;
-    width: 100vw;
-    height: 100vh;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; 
+    align-items: center;    
     box-sizing: border-box;
     padding: 30px;
+    height: 100vh;          
+    width: 100%;           
 }
 
 .screen.active {
     display: flex;
 }
-
 
 input,
 select {
@@ -74,16 +64,12 @@ select {
     -webkit-appearance: none;
     -moz-appearance: none;
     cursor: pointer;
-
     text-align: center;
     text-align-last: center;
-
     background-image: url("assets/seta.svg");
     background-repeat: no-repeat;
     background-size: 14px;
-
     background-position: right 24px center;
-
     padding-right: 40px;
 }
 
@@ -120,7 +106,6 @@ button:hover {
     opacity: 0.5;
 }
 
-
 .metrics-container {
     display: flex;
     flex-direction: row;
@@ -153,20 +138,17 @@ button:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-
-/* normal */
+/* State Background Environments */
 body.state-normal {
     background: radial-gradient(circle at center, #ffffff 0%, #b2e7a1 100%);
     color: #1b4314;
 }
 
-/* abnormal */
 body.state-abnormal {
     background: radial-gradient(circle at center, #ffffff 0%, #fbe79a 100%);
     color: #4a3b05;
 }
 
-/* concerning */
 body.state-concerning {
     background: radial-gradient(circle at center, #ffffff 0%, #fca2a2 100%);
     color: #5c0909;
@@ -201,7 +183,6 @@ body.state-concerning {
     height: auto;
     margin: 3vh auto 1vh;
     display: block;
-
     transition: transform 0.3s ease;
 }
 
@@ -210,15 +191,7 @@ body.state-concerning .blob-character {
 }
 
 @keyframes gentlePulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
