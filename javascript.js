@@ -167,14 +167,19 @@ function updateUI(output) {
     pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
 
     if (offCount === 3) {
-      // estado concerning: 3 valores fora da normalidade
-      pageBody.classList.add("state-concerning");
-      if (statusTitle) statusTitle.textContent = "Concerning";
-      if (statusBlob) statusBlob.src = "assets/concerning.svg";
-      if (statusDescription) {
-        statusDescription.innerHTML = `${currentName}'s levels are <strong>unhealthy</strong>.<br>We advise you to <strong>call emergency services</strong>.`;
-      }
-    }
+  // estado concerning: 3 valores fora da normalidade
+  pageBody.classList.add("state-concerning");
+  if (statusTitle) statusTitle.textContent = "Concerning";
+  if (statusBlob) statusBlob.src = "assets/concerning.svg";
+  
+  if (statusDescription) {
+    // Injects the interactive, underlined text linking directly to the emergency protocol
+    statusDescription.innerHTML = `
+      ${currentName}'s levels are <strong>unhealthy</strong>.<br>
+      We advise you to <a href="tel:112" style="color: inherit; text-decoration: underline; font-weight: bold;">call emergency services</a>.
+    `;
+  }
+}
     else if (offCount > 0) {
       // estado abnormal: 1 ou 2 valores fora
       pageBody.classList.add("state-abnormal");
