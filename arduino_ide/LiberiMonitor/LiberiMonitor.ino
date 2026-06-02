@@ -7,21 +7,10 @@
 #include "spo2_algorithm.h"
 #include <Adafruit_MLX90614.h>
 #include <Arduino.h>
-#include <ESPAsyncWebServer.h>
-#include <HTTPClient.h>
-#include <LittleFS.h>
-#include <WiFi.h>
 #include <Wire.h>
-#include <esp_bt.h>
+#include "BluetoothSerial.h"
 
-// ── Wi‑Fi Settings ──────────────────────────────────────────────────────────
-const char *ssid = WIFI_SSID;
-const char *password = WIFI_PASSWORD;
-const char *ap_ssid = "LiberiMonitor";
-const char *ap_pass = "12345678";
-
-const char *local_server_host = LOCAL_SERVER_HOST;
-const int local_server_port = 3000;
+BluetoothSerial SerialBT;
 
 // ── GPIO pins (ESP32) ────────────────────────────────────────────────────────
 const int RED_PIN = 27;
@@ -48,9 +37,7 @@ bool lastSystemActive = false;
 unsigned long lastDebounceTime = 0;
 bool bufferPrimeiroEnchimento = true; // Controla o primeiro setup de dados
 
-// ── Web server & SSE endpoint ──────────────────────────────────────────────
-AsyncWebServer server(80);
-AsyncEventSource events("/events");
+
 
 void setStatusColor(int r, int g, int b) {
   analogWrite(RED_PIN, r);
@@ -65,20 +52,7 @@ void IRAM_ATTR toggleSystem() {
   }
 }
 
-void httpPostTask(void *parameter) {
-  String *payload = (String *)parameter;
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    String serverUrl = "http://" + String(local_server_host) + ":" +
-                       String(local_server_port) + "/api/data";
-    http.begin(serverUrl);
-    http.addHeader("Content-Type", "text/plain");
-    http.POST(*payload);
-    http.end();
-  }
-  delete payload;
-  vTaskDelete(NULL);
-}
+
 
 // ────────────────────────────────────────────────────────────────────────────
 //  Setup
@@ -87,22 +61,7 @@ void setup() {
   Serial.begin(115200);
   delay(1500); 
 
-  btStop();
-
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to Wi‑Fi");
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 30) {
-    delay(500);
-    Serial.print(".");
-    attempts++;
-  }
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
-  } else {
-    Serial.println("\nWi‑Fi failed – starting AP");
-    WiFi.softAP(ap_ssid, ap_pass);
-  }
+  SerialBT.begin("Liberi_Monitor");
 
   Wire.begin(21, 22);
   Wire.setClock(100000); 
@@ -130,16 +89,7 @@ void setup() {
   int adcRange = 4096;
   particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
 
-  if (LittleFS.begin(true)) {
-    server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
-  }
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(LittleFS, "/index.html", "text/html");
-  });
-
-  server.addHandler(&events);
-  server.begin();
   
   // Flash de sucesso
   setStatusColor(0, 255, 0);
@@ -156,20 +106,12 @@ void loop() {
     lastSystemActive = systemActive;
     if (!systemActive) {
       Serial.println("STATUS,OFF");
-      events.send("STATUS,OFF");
-      if (WiFi.status() == WL_CONNECTED) {
-        String *payloadStr = new String("STATUS,OFF");
-        xTaskCreatePinnedToCore(httpPostTask, "HTTPPostTask", 4096, payloadStr, 1, NULL, 0);
-      }
+      SerialBT.println("STATUS,OFF");
       setStatusColor(0, 0, 0);
       bufferPrimeiroEnchimento = true; // Reseta o buffer ao desligar
     } else {
       Serial.println("STATUS,ON");
-      events.send("STATUS,ON");
-      if (WiFi.status() == WL_CONNECTED) {
-        String *payloadStr = new String("STATUS,ON");
-        xTaskCreatePinnedToCore(httpPostTask, "HTTPPostTask", 4096, payloadStr, 1, NULL, 0);
-      }
+      SerialBT.println("STATUS,ON");
       setStatusColor(0, 0, 255); // Azul enquanto calibra
     }
   }
@@ -214,14 +156,9 @@ void loop() {
     char sseMsg[128];
     snprintf(sseMsg, sizeof(sseMsg), "DATA,%.1f,%d,%d", temp, finalHR, finalSPO2);
     Serial.println(sseMsg);
+    SerialBT.println(sseMsg);
 
-    // Envia os dados para o JavaScript (SSE e Node.js)
-    events.send(sseMsg, NULL, millis());
-    if (WiFi.status() == WL_CONNECTED) {
-      String *payloadStr = new String(sseMsg);
-      // Criado de forma assíncrona para não prender o loop de leitura rápida
-      xTaskCreatePinnedToCore(httpPostTask, "HTTPPostTask", 4096, payloadStr, 1, NULL, 0);
-    }
+
 
     // 7. Atualização dinâmica dos LEDs baseada nos valores lidos
     if (finalSPO2 >= 95 && finalHR >= 50 && finalHR <= 130) {

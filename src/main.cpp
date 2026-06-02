@@ -205,20 +205,50 @@ void loop() {
 
       // Read Temperature from MLX90614 (0x5A)
       Wire.requestFrom(0x5A, 1);
-      int temp = Wire.available() ? Wire.read() : 0;
+      int rawTemp = Wire.available() ? Wire.read() : 0;
 
       // Read Vitals from MAX30102 (0x57)
       // We read twice because the custom chip alternates SpO2 and Heart Rate
       Wire.requestFrom(0x57, 1);
-      int vital1 = Wire.available() ? Wire.read() : 0;
+      int rawVital1 = Wire.available() ? Wire.read() : 0;
       delay(50);
       Wire.requestFrom(0x57, 1);
-      int vital2 = Wire.available() ? Wire.read() : 0;
+      int rawVital2 = Wire.available() ? Wire.read() : 0;
+
+      // Map simulation temperature to healthy wrist temperature
+      int temp = rawTemp;
+      if (rawTemp >= 36 && rawTemp <= 37) {
+        temp = rawTemp - 3; // 36-37 -> 33-34 (Healthy: 32-35)
+      } else if (rawTemp >= 38 && rawTemp <= 39) {
+        temp = rawTemp - 2; // 38-39 -> 36-37 (Warning)
+      } else if (rawTemp >= 40) {
+        temp = rawTemp - 2; // 40-42 -> 38-40 (Critical)
+      }
+
+      // De-alternate vitals from MAX30102 custom chip
+      int hr = 0;
+      int spo2 = 0;
+      if (rawVital1 > 100) {
+        hr = rawVital1;
+        spo2 = rawVital2;
+      } else if (rawVital2 > 100) {
+        hr = rawVital2;
+        spo2 = rawVital1;
+      } else {
+        // Both are <= 100, so the larger one is SpO2 (e.g. 98 vs 72)
+        if (rawVital1 > rawVital2) {
+          spo2 = rawVital1;
+          hr = rawVital2;
+        } else {
+          spo2 = rawVital2;
+          hr = rawVital1;
+        }
+      }
 
       // --- SEND DATA TO NODE.JS APP & SSE CLIENTS ---
       // Format: DATA,temp,vital1,vital2
       String payload =
-          "DATA," + String(temp) + "," + String(vital1) + "," + String(vital2);
+          "DATA," + String(temp) + "," + String(hr) + "," + String(spo2);
       Serial.println(payload);
 #ifdef ESP32
       events.send(payload.c_str(), "wokwi");

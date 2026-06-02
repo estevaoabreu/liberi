@@ -76,6 +76,18 @@ function setNotifications(choice) {
   nextStep(6); // Forward user directly to dashboard
 }
 
+// --- Moving Average Buffers ---
+const BUFFER_SIZE = 10;
+const tempBuffer = [];
+const hrBuffer = [];
+const spo2Buffer = [];
+
+function getAverage(arr) {
+  if (arr.length === 0) return 0;
+  const sum = arr.reduce((a, b) => a + b, 0);
+  return sum / arr.length;
+}
+
 // --- ESP32 Sensor Processing Logic ---
 
 function parseSensorLine(output) {
@@ -95,32 +107,50 @@ function parseSensorLine(output) {
 function updateUI(output) {
   const sensorData = parseSensorLine(output);
   if (sensorData) {
-    console.log("Parsed Sensor Data:", sensorData);
+    console.log("Parsed Sensor Data (Raw):", sensorData);
+
+    // Apply Moving Average Filter
+    if (!isNaN(sensorData.temp) && sensorData.temp > 0) {
+      tempBuffer.push(sensorData.temp);
+      if (tempBuffer.length > BUFFER_SIZE) tempBuffer.shift();
+    }
+    if (!isNaN(sensorData.heartrate) && sensorData.heartrate > 0) {
+      hrBuffer.push(sensorData.heartrate);
+      if (hrBuffer.length > BUFFER_SIZE) hrBuffer.shift();
+    }
+    if (!isNaN(sensorData.oxygen) && sensorData.oxygen > 0) {
+      spo2Buffer.push(sensorData.oxygen);
+      if (spo2Buffer.length > BUFFER_SIZE) spo2Buffer.shift();
+    }
+
+    const avgTemp = tempBuffer.length > 0 ? getAverage(tempBuffer) : sensorData.temp;
+    const avgHR = hrBuffer.length > 0 ? Math.round(getAverage(hrBuffer)) : sensorData.heartrate;
+    const avgSPO2 = spo2Buffer.length > 0 ? Math.round(getAverage(spo2Buffer)) : sensorData.oxygen;
 
     pageBody.style.background = "";
 
-    if (!isNaN(sensorData.temp)) {
-      temperature.textContent = `${sensorData.temp.toFixed(1)}ºC`;
+    if (!isNaN(avgTemp)) {
+      temperature.textContent = `${avgTemp.toFixed(1)}ºC`;
     } else {
       temperature.textContent = "N/A";
     }
 
-    if (!isNaN(sensorData.heartrate)) {
-      heartrate.textContent = `${sensorData.heartrate}`;
+    if (!isNaN(avgHR)) {
+      heartrate.textContent = `${avgHR}`;
     } else {
       heartrate.textContent = "N/A";
     }
 
-    if (!isNaN(sensorData.oxygen)) {
-      oxygen.textContent = `${sensorData.oxygen}%`;
+    if (!isNaN(avgSPO2)) {
+      oxygen.textContent = `${avgSPO2}%`;
     } else {
       oxygen.textContent = "N/A";
     }
 
     // 2. Compute Health Boundary Metrics
-    const isTempOff = sensorData.temp > 38 || sensorData.temp < 35;
-    const isHeartOff = sensorData.heartrate > 150 || sensorData.heartrate < 90;
-    const isOxygenOff = sensorData.oxygen < 92;
+    const isTempOff = avgTemp > 35.0 || avgTemp < 32.0;
+    const isHeartOff = avgHR > 150 || avgHR < 90;
+    const isOxygenOff = avgSPO2 < 92;
 
     let offCount = 0;
     let offMetrics = [];
