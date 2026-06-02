@@ -3,7 +3,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 #include "MAX30105.h"
-#include "secrets.h"
 #include "spo2_algorithm.h"
 #include <Adafruit_MLX90614.h>
 #include <Arduino.h>
@@ -65,6 +64,7 @@ void setup() {
 
   Wire.begin(21, 22);
   Wire.setClock(100000); 
+  Wire.setTimeOut(150); // Timeout to prevent the ESP32 from freezing if the sensor crashes!
 
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
@@ -81,7 +81,7 @@ void setup() {
   Wire.setClock(100000); 
 
   // Configuração focada em rapidez de resposta
-  byte ledBrightness = 60; 
+  byte ledBrightness = 25; // REDUZIDO para evitar picos de corrente e crash do ESP32!
   byte sampleAverage = 1;  // Reduzido para 1 para feedback instantâneo amostra a amostra
   byte ledMode = 2;    
   int sampleRate = 50; 
