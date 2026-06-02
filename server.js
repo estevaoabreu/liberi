@@ -76,6 +76,9 @@ const server = http.createServer((req, res) => {
     case ".jpg":
       contentType = "image/jpg";
       break;
+    case ".svg":
+      contentType = "image/svg+xml";
+      break;
   }
 
   fs.readFile(filePath, (error, content) => {

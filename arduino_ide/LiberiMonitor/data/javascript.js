@@ -4,6 +4,18 @@ const heartrate = document.getElementById("heartrate");
 const oxygen = document.getElementById("oxygen");
 const pageBody = document.body;
 
+// --- Moving Average Buffers ---
+const BUFFER_SIZE = 10;
+const tempBuffer = [];
+const hrBuffer = [];
+const spo2Buffer = [];
+
+function getAverage(arr) {
+  if (arr.length === 0) return 0;
+  const sum = arr.reduce((a, b) => a + b, 0);
+  return sum / arr.length;
+}
+
 function parseSensorLine(output) {
   // Accept DATA lines even if there is leading/trailing noise around the payload.
   const match = output.match(
@@ -23,32 +35,50 @@ function parseSensorLine(output) {
 function updateUI(output) {
   const sensorData = parseSensorLine(output);
   if (sensorData) {
-    console.log("Parsed Sensor Data:", sensorData);
+    console.log("Parsed Sensor Data (Raw):", sensorData);
 
-    if (!isNaN(sensorData.temp)) {
-      temperature.textContent = `${sensorData.temp.toFixed(1)} ºC`;
+    // Apply Moving Average Filter
+    if (!isNaN(sensorData.temp) && sensorData.temp > 0) {
+      tempBuffer.push(sensorData.temp);
+      if (tempBuffer.length > BUFFER_SIZE) tempBuffer.shift();
+    }
+    if (!isNaN(sensorData.heartrate) && sensorData.heartrate > 0) {
+      hrBuffer.push(sensorData.heartrate);
+      if (hrBuffer.length > BUFFER_SIZE) hrBuffer.shift();
+    }
+    if (!isNaN(sensorData.oxygen) && sensorData.oxygen > 0) {
+      spo2Buffer.push(sensorData.oxygen);
+      if (spo2Buffer.length > BUFFER_SIZE) spo2Buffer.shift();
+    }
+
+    const avgTemp = tempBuffer.length > 0 ? getAverage(tempBuffer) : sensorData.temp;
+    const avgHR = hrBuffer.length > 0 ? Math.round(getAverage(hrBuffer)) : sensorData.heartrate;
+    const avgSPO2 = spo2Buffer.length > 0 ? Math.round(getAverage(spo2Buffer)) : sensorData.oxygen;
+
+    if (!isNaN(avgTemp)) {
+      temperature.textContent = `${avgTemp.toFixed(1)} ºC`;
     } else {
       temperature.textContent = "N/A";
     }
 
-    if (!isNaN(sensorData.heartrate)) {
-      heartrate.textContent = `${sensorData.heartrate} bpm`;
+    if (!isNaN(avgHR)) {
+      heartrate.textContent = `${avgHR} bpm`;
     } else {
       heartrate.textContent = "N/A";
     }
 
-    if (!isNaN(sensorData.oxygen)) {
-      oxygen.textContent = `${sensorData.oxygen} %`;
+    if (!isNaN(avgSPO2)) {
+      oxygen.textContent = `${avgSPO2} %`;
     } else {
       oxygen.textContent = "N/A";
     }
 
     if (
-      sensorData.heartrate > 150 ||
-      sensorData.heartrate < 90 ||
-      sensorData.temp > 38 ||
-      sensorData.temp < 35 ||
-      sensorData.oxygen < 92
+      avgHR > 150 ||
+      avgHR < 90 ||
+      avgTemp > 35.0 ||
+      avgTemp < 32.0 ||
+      avgSPO2 < 92
     ) {
       pageBody.style.background = `
     radial-gradient(ellipse at top, #d0d0d0, transparent),
