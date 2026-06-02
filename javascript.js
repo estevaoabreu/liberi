@@ -106,7 +106,7 @@ function updateUI(output) {
   const sensorData = parseSensorLine(output);
   if (sensorData) {
     console.log("Parsed Sensor Data:", sensorData);
-const connectionControls = document.querySelector(".connection-controls");
+    const connectionControls = document.querySelector(".connection-controls");
     const dashboardFooter = document.querySelector(".dashboard-footer");
     if (connectionControls) connectionControls.style.display = "none";
     if (dashboardFooter) dashboardFooter.style.display = "flex";
@@ -129,10 +129,24 @@ const connectionControls = document.querySelector(".connection-controls");
     } else {
       oxygen.textContent = "N/A";
     }
-
-    // 2. Compute Health Boundary Metrics
+    // temp fixa
     const isTempOff = sensorData.temp > 38 || sensorData.temp < 35;
-    const isHeartOff = sensorData.heartrate > 150 || sensorData.heartrate < 90;
+
+    //bpm dinamico dependente da idade
+    const ageMonths = parseInt(appData.babyAge, 10) || 1;
+    let minHeart = 80;
+    let maxHeart = 190;
+
+    if (ageMonths === 1) {
+      minHeart = 90;
+      maxHeart = 205;
+    } else if (ageMonths >= 13) {
+      minHeart = 65;
+      maxHeart = 140;
+    }
+    const isHeartOff = sensorData.heartrate > maxHeart || sensorData.heartrate < minHeart;
+    
+    //sat fixa
     const isOxygenOff = sensorData.oxygen < 92;
 
     let offCount = 0;
@@ -339,14 +353,14 @@ source.onmessage = function (event) {
       connectBtn.textContent = "Connect to ESP32";
       connectBtn.style.backgroundColor = "#1B1B1B";
     }
-  }
   } else if (data === "STATUS,ON") {
 
   } else {
     updateUI(data);
   }
+};
 
-  // --- Footer Icon Navigation Infrastructure ---
+// --- Footer Icon Navigation Infrastructure ---
 
 function openInfoScreen() {
   // Hide all screens and active info layout window
@@ -363,17 +377,18 @@ function openAgeBoundsScreen() {
   const currentName = appData.babyName || "Tommy";
   const ageMonths = parseInt(appData.babyAge, 10) || 1;
 
-  // Personalize the header title exactly like the mockup
   if (heading) {
-    heading.textContent = `According to ${currentName}’s age his levels should be:`;
+    heading.textContent = `According to ${currentName}’s age their levels should be:`;
   }
 
-  // Adjust thresholds depending on the month ranges specified on onboarding
+  // ajustado a idade inserida pelos pais
   if (heartDisplay) {
-    if (ageMonths <= 12) {
-      heartDisplay.textContent = "100 - 160 bpm (Infant standard)";
+    if (ageMonths === 1) {
+      heartDisplay.textContent = "90 - 205 bpm";
+    } else if (ageMonths >= 2 && ageMonths <= 12) {
+      heartDisplay.textContent = "80 - 190 bpm";
     } else {
-      heartDisplay.textContent = "90 - 150 bpm (Toddler standard)";
+      heartDisplay.textContent = "65 - 140 bpm";
     }
   }
 
@@ -382,7 +397,6 @@ function openAgeBoundsScreen() {
 }
 
 function backToDashboard() {
-  // Safe return vector back to main live dashboard panel
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const dashboard = document.getElementById("step-6");
   if (dashboard) dashboard.classList.add("active");
@@ -410,4 +424,3 @@ function refreshSystem() {
       console.warn("Could not dispatch refresh signal over network node:", error);
     });
 }
-};
