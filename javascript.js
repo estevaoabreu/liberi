@@ -1,17 +1,18 @@
-// estado
+// --- Global Application State ---
 const appData = {
   babyName: "",
   babyAge: 0,
   notificationsEnabled: false,
 };
 
+// --- DOM Elements ---
 const connectBtn = document.getElementById("connectBtn");
 const temperature = document.getElementById("temperature");
 const heartrate = document.getElementById("heartrate");
 const oxygen = document.getElementById("oxygen");
 const pageBody = document.body;
 
-// onboarding
+// --- Onboarding Flow ---
 
 document.addEventListener("DOMContentLoaded", () => {
   const ageSelect = document.getElementById("babyAge");
@@ -26,11 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function nextStep(stepNumber) {
-  // nome e idade input
+  // Name and age validation checks
   if (stepNumber === 4) {
     const nameInput = document.getElementById("babyName").value.trim();
     
-    // tem de inserir nome
     if (nameInput === "") {
       alert("Please enter your baby's name before moving on! ❤️");
       return; 
@@ -50,7 +50,6 @@ function nextStep(stepNumber) {
     }
   }
 
-  // update nome antes de recolher dados
   if (stepNumber === 6) {
     const dashboardWelcome = document.getElementById("dashboardWelcome");
     if (dashboardWelcome) {
@@ -58,7 +57,7 @@ function nextStep(stepNumber) {
     }
   }
 
-  // This part only runs if the validation check passes
+  // Handle CSS screen view switches
   const screens = document.querySelectorAll(".screen");
   screens.forEach((screen) => {
     screen.classList.remove("active");
@@ -73,16 +72,13 @@ function nextStep(stepNumber) {
 function setNotifications(choice) {
   appData.notificationsEnabled = choice;
   console.log("Onboarding complete. Collected Data:", appData);
-  nextStep(6); // Forward user directly to dashboard
+  nextStep(6);
 }
 
 // --- ESP32 Sensor Processing Logic ---
 
 function parseSensorLine(output) {
-  // Accept DATA lines even if there is leading/trailing noise around the payload.
-  const match = output.match(
-    /DATA\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(\d+)\s*,\s*(\d+)/i,
-  );
+  const match = output.match(/DATA\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(\d+)\s*,\s*(\d+)/i);
   if (!match) return null;
 
   return {
@@ -96,12 +92,15 @@ function updateUI(output) {
   const sensorData = parseSensorLine(output);
   if (sensorData) {
     console.log("Parsed Sensor Data:", sensorData);
-const connectionControls = document.querySelector(".connection-controls");
+    
+    // Swap dashboard control views smoothly
+    const connectionControls = document.querySelector(".connection-controls");
     const dashboardFooter = document.querySelector(".dashboard-footer");
     if (connectionControls) connectionControls.style.display = "none";
     if (dashboardFooter) dashboardFooter.style.display = "flex";
     pageBody.style.background = "";
 
+    // Render Metrics
     if (!isNaN(sensorData.temp)) {
       temperature.textContent = `${sensorData.temp.toFixed(1)}ºC`;
     } else {
@@ -120,7 +119,7 @@ const connectionControls = document.querySelector(".connection-controls");
       oxygen.textContent = "N/A";
     }
 
-    // 2. Compute Health Boundary Metrics
+    // Compute Health Boundaries
     const isTempOff = sensorData.temp > 38 || sensorData.temp < 35;
     const isHeartOff = sensorData.heartrate > 150 || sensorData.heartrate < 90;
     const isOxygenOff = sensorData.oxygen < 92;
@@ -132,14 +131,12 @@ const connectionControls = document.querySelector(".connection-controls");
     if (isHeartOff) { offCount++; offMetrics.push("heart rate"); }
     if (isOxygenOff) { offCount++; offMetrics.push("oxygen level"); }
 
-    // Gather Status Screen Nodes
     const statusTitle = document.getElementById("statusTitle");
     const statusDescription = document.getElementById("statusDescription");
     const statusBlob = document.getElementById("statusBlob");
     const dashboardWelcome = document.getElementById("dashboardWelcome");
     const currentName = appData.babyName || "Tommy";
 
-    // Set greeting name context
     if (dashboardWelcome) {
       dashboardWelcome.textContent = `${currentName}'s levels are...`;
     }
@@ -147,7 +144,6 @@ const connectionControls = document.querySelector(".connection-controls");
     pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
 
     if (offCount === 3) {
-      // estado concerning: 3 valores fora da normalidade
       pageBody.classList.add("state-concerning");
       if (statusTitle) statusTitle.textContent = "Concerning";
       if (statusBlob) statusBlob.src = "assets/concerning.svg";
@@ -156,7 +152,6 @@ const connectionControls = document.querySelector(".connection-controls");
       }
     } 
     else if (offCount > 0) {
-      // estado abnormal: 1 ou 2 valores fora
       pageBody.classList.add("state-abnormal");
       if (statusTitle) statusTitle.textContent = "Abnormal";
       if (statusBlob) statusBlob.src = "assets/abnormal.svg";
@@ -166,7 +161,6 @@ const connectionControls = document.querySelector(".connection-controls");
       }
     } 
     else {
-      // estado normal: todos os valores dentro 
       pageBody.classList.add("state-normal");
       if (statusTitle) statusTitle.textContent = "Normal";
       if (statusBlob) statusBlob.src = "assets/normal.svg";
@@ -179,6 +173,7 @@ const connectionControls = document.querySelector(".connection-controls");
   }
 }
 
+// --- Method A: Web Serial Connection Structure ---
 
 let port;
 let reader;
@@ -186,9 +181,7 @@ let inputDone;
 let inputStream;
 
 class LineBreakTransformer {
-  constructor() {
-    this.chunks = "";
-  }
+  constructor() { this.chunks = ""; }
   transform(chunk, controller) {
     this.chunks += chunk;
     const lines = this.chunks.split("\n");
@@ -196,9 +189,7 @@ class LineBreakTransformer {
     lines.forEach((line) => controller.enqueue(line));
   }
   flush(controller) {
-    if (this.chunks) {
-      controller.enqueue(this.chunks);
-    }
+    if (this.chunks) controller.enqueue(this.chunks);
   }
 }
 
@@ -213,9 +204,7 @@ async function connectSerial() {
 
       const decoder = new TextDecoderStream();
       inputDone = port.readable.pipeTo(decoder.writable);
-      inputStream = decoder.readable.pipeThrough(
-        new TransformStream(new LineBreakTransformer()),
-      );
+      inputStream = decoder.readable.pipeThrough(new TransformStream(new LineBreakTransformer()));
       reader = inputStream.getReader();
 
       while (true) {
@@ -235,9 +224,7 @@ async function connectSerial() {
     }
   } else {
     console.error("Web Serial API not supported in this browser.");
-    alert(
-      "Web Serial API is not supported in this browser. Please use Chrome or Edge.",
-    );
+    alert("Web Serial API is not supported in this browser. Please use Chrome or Edge.");
   }
 }
 
@@ -245,19 +232,13 @@ if (connectBtn) {
   connectBtn.addEventListener("click", connectSerial);
 }
 
+// --- Method B: Wireless Server-Sent Events (SSE) Structure ---
+
 const source = new EventSource("/events");
-
-source.onopen = function () {
-
-};
-
-source.onerror = function () {
-};
 
 source.onmessage = function (event) {
   let data = event.data;
 
-  // If the data is JSON-formatted (e.g. from the Wokwi/serial bridge), parse it.
   if (data.startsWith("{")) {
     try {
       const parsed = JSON.parse(data);
@@ -294,7 +275,6 @@ source.onmessage = function (event) {
       radial-gradient(ellipse at bottom, #73ff00, transparent)
     `;
 
-    // WIRELESS RESET VIEWS: Show the button and hide footer icons
     const connectionControls = document.querySelector(".connection-controls");
     const dashboardFooter = document.querySelector(".dashboard-footer");
     if (connectionControls) connectionControls.style.display = "block";
@@ -303,17 +283,16 @@ source.onmessage = function (event) {
       connectBtn.textContent = "Connect to ESP32";
       connectBtn.style.backgroundColor = "#1B1B1B";
     }
-
   } else if (data === "STATUS,ON") {
-
+    // Left open for your custom hardware awakening triggers if needed
   } else {
     updateUI(data);
   }
+};
 
-  // --- Footer Icon Navigation Infrastructure ---
+// --- Footer Icon Navigation Infrastructure ---
 
 function openInfoScreen() {
-  // Hide all screens and active info layout window
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const target = document.getElementById("info-screen");
   if (target) target.classList.add("active");
@@ -327,12 +306,10 @@ function openAgeBoundsScreen() {
   const currentName = appData.babyName || "Tommy";
   const ageMonths = parseInt(appData.babyAge, 10) || 1;
 
-  // Personalize the header title exactly like the mockup
   if (heading) {
     heading.textContent = `According to ${currentName}’s age his levels should be:`;
   }
 
-  // Adjust thresholds depending on the month ranges specified on onboarding
   if (heartDisplay) {
     if (ageMonths <= 12) {
       heartDisplay.textContent = "100 - 160 bpm (Infant standard)";
@@ -346,42 +323,30 @@ function openAgeBoundsScreen() {
 }
 
 function backToDashboard() {
-  // Safe return vector back to main live dashboard panel
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const dashboard = document.getElementById("step-6");
   if (dashboard) dashboard.classList.add("active");
 }
 
 function refreshSystem() {
-  console.log("Refreshing system monitor variables...");
+  console.log("Requesting instant data update from ESP32...");
   
-  if (temperature) temperature.textContent = "--";
-  if (heartrate) heartrate.textContent = "--";
-  if (oxygen) oxygen.textContent = "--";
-  
-  pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
-  pageBody.style.background = ""; 
-  
-  const statusBlob = document.getElementById("statusBlob");
-  const statusTitle = document.getElementById("statusTitle");
-  const statusDescription = document.getElementById("statusDescription");
-
-  if (statusBlob) statusBlob.src = "assets/neutral.svg";
-  if (statusTitle) statusTitle.textContent = "Connecting...";
-  if (statusDescription) {
-    statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device.";
+  const refreshButton = document.querySelector("button[onclick='refreshSystem()'] img");
+  if (refreshButton) {
+    refreshButton.style.transition = "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
+    refreshButton.style.transform = "rotate(360deg)";
+    
+    setTimeout(() => {
+      refreshButton.style.transition = "none";
+      refreshButton.style.transform = "rotate(0deg)";
+    }, 600);
   }
 
-  // SWAP VIEWS BACK: Show connect button container and hide footer navigation icons
-  const connectionControls = document.querySelector(".connection-controls");
-  const dashboardFooter = document.querySelector(".dashboard-footer");
-  if (connectionControls) connectionControls.style.display = "block";
-  if (dashboardFooter) dashboardFooter.style.display = "none";
-
-  // Reset the connect button text and color back to your default styling
-  if (connectBtn) {
-    connectBtn.textContent = "Connect to ESP32";
-    connectBtn.style.backgroundColor = "#1B1B1B";
-  }
+  fetch('/refresh') 
+    .then(response => {
+      console.log("Instant poll request successfully processed by system node.");
+    })
+    .catch(error => {
+      console.warn("Could not dispatch refresh signal over network node:", error);
+    });
 }
-};
