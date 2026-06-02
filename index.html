@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liberi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css.css">
     <script src="libraries/p5.min.js"></script>
 
-  <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.svg" />
+    <link rel="shortcut icon" type="image/x-icon" href="assets/favicon.svg" />
 </head>
+
 <body>
 
     <main class="screens">
-        <div style="position: fixed; top: 10px; left: 10px; z-index: 9999; background: rgba(0, 0, 0, 0.85); padding: 8px; border-radius: 8px; display: flex; gap: 8px; font-family: sans-serif;">
-  <button onclick="openInfoScreen()" style="color: white; background: #222; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">ℹ️ Info Screen</button>
-  <button onclick="openAgeBoundsScreen()" style="color: white; background: #222; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📊 Range Screen</button>
-  <button onclick="backToDashboard()" style="color: white; background: #222; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">🏠 Dashboard</button>
-  <button onclick="nextStep(1)" style="color: white; background: #222; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">🔄 Reset Flow</button>
-</div>
-    
         <section id="step-1" class="screen active" onclick="nextStep(2)">
             <div style="margin-top: 37vh; margin-bottom: auto; text-align: center;">
-                <span style="display: block; font-size: 24px; font-weight: 400; color: #333; margin-bottom: 8px;">Welcome to</span>
-                <img src="assets/logo.svg" alt="Liberi" style="height: 55px; width: auto; max-width: 90%; display: inline-block; pointer-events: none;">
+                <span
+                    style="display: block; font-size: 24px; font-weight: 400; color: #333; margin-bottom: 8px;">Welcome
+                    to</span>
+                <img src="assets/logo.svg" alt="Liberi"
+                    style="height: 55px; width: auto; max-width: 90%; display: inline-block; pointer-events: none;">
             </div>
 
-            <p class="hint" style="margin-top: auto; margin-bottom: 4vh; font-size: 14px; color: #333; text-align: center;">
-            Click anywhere to continue
+            <p class="hint"
+                style="margin-top: auto; margin-bottom: 4vh; font-size: 14px; color: #333; text-align: center;">
+                Click anywhere to continue
             </p>
         </section>
 
@@ -49,7 +50,7 @@
         <section id="step-4" class="screen">
             <h2>How old is Tommy?</h2>
             <select id="babyAge">
-                </select>
+            </select>
             <p>Health levels differ based on a baby's age</p>
             <button onclick="nextStep(5)">Next</button>
         </section>
@@ -63,87 +64,97 @@
             <p>Liberi uses notifications to alert you in case your baby's levels are below or above average.</p>
         </section>
 
-<section id="step-6" class="screen">
-    <h3 id="dashboardWelcome">Tommy's levels are...</h3>
+        <section id="step-6" class="screen">
+            <h3 id="dashboardWelcome">Tommy's levels are...</h3>
 
-    <div class="metrics-container">
-        <div class="metric-box">
-            <h2 id="temperature">--</h2>
-            <p>Temperature</p>
-        </div>
-        <div class="metric-box">
-            <h2 id="heartrate">--</h2>
-            <p>Heart rate</p>
-        </div>
-        <div class="metric-box">
-            <h2 id="oxygen">--</h2>
-            <p>Oxygen</p>
-        </div>
-    </div>
+            <div class="metrics-container">
+                <div class="metric-box">
+                    <h2 id="temperature">--</h2>
+                    <p>Temperature</p>
+                </div>
+                <div class="metric-box">
+                    <h2 id="heartrate">--</h2>
+                    <p>Heart rate</p>
+                </div>
+                <div class="metric-box">
+                    <h2 id="oxygen">--</h2>
+                    <p>Oxygen</p>
+                </div>
+            </div>
 
-    <div class="status-display-area">
-        <img id="statusBlob" src="assets/neutral.svg" alt="Baby Status Character" class="blob-character">
-        <h3 id="statusTitle">Connecting...</h3>
-        <p id="statusDescription">Please click the button below<br>to pair your monitor device</p>
-    </div>
+            <div class="status-display-area">
+                <img id="statusBlob" src="assets/neutral.svg" alt="Baby Status Character" class="blob-character">
+                <h3 id="statusTitle">Connecting...</h3>
+                <p id="statusDescription">Please click the button below<br>to pair your monitor device</p>
+            </div>
 
-    <div class="connection-controls" style="margin-top: 4vh;">
-        <button id="connectBtn" style="background-color: #1B1B1B; color: white; border-radius: 25px; padding: 10px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer;">Connect to bracelet</button>
-    </div>
+            <div class="connection-controls" style="margin-top: 4vh;">
+                <button id="connectBtn"
+                    style="background-color: #1B1B1B; color: white; border-radius: 25px; padding: 10px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer;">Connect
+                    to bracelet</button>
+            </div>
 
-    <div class="dashboard-footer" style="display: none; justify-content: center; gap: 40px; margin-top: 4vh; padding-bottom: 2vh;">
-        <!-- app info -->
-        <button onclick="openInfoScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
-            <img src="assets/info.svg" alt="Information" style="width: 32px; height: 32px;">
-        </button>
-        
-        <!-- age range -->
-        <button onclick="openAgeBoundsScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
-            <img src="assets/range.svg" alt="Age Ranges" style="width: 32px; height: 32px;">
-        </button>
-    </div>
-</section>
+            <div class="dashboard-footer"
+                style="display: none; justify-content: center; gap: 40px; margin-top: 4vh; padding-bottom: 2vh;">
+                <!-- liberi info -->
+                <button onclick="openInfoScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
+                    <img src="assets/info.svg" alt="Information" style="width: 32px; height: 32px;">
+                </button>
+
+                <!-- valores p idade -->
+                <button onclick="openAgeBoundsScreen()"
+                    style="background: none; border: none; padding: 0; cursor: pointer;">
+                    <img src="assets/range.svg" alt="Age Ranges" style="width: 32px; height: 32px;">
+                </button>
+            </div>
+        </section>
 
 
-<section id="info-screen" class="screen" style="padding: 60px 20px; text-align: center;">
-    <h2 style="margin-top: 6vh; font-size: 28px;">About Liberi</h2>
+        <section id="info-screen" class="screen" style="padding: 60px 20px; text-align: center;">
+            <h2 style="margin-top: 6vh; font-size: 28px;">About Liberi</h2>
 
-    <div style="margin: 4vh auto; max-width: 85%; text-align: center; line-height: 1.6; font-size: 16px; color: #333;">
-        <p><strong>Liberi</strong> is an advanced medical telemetry monitor built to give parents peace of mind.</p>
-        <p style="margin-top: 15px;">By reading smart hardware data over Web Serial or wireless nodes, the application constantly evaluates real-time vital signs against safe physiological boundaries.</p>
-        <p style="margin-top: 15px;">If readings spike abnormal or concerning, system push notifications will alert you instantly to ensure your child remains completely protected.</p>
-    </div>
+            <div
+                style="margin: 4vh auto; max-width: 85%; text-align: center; line-height: 1.6; font-size: 16px; color: #333;">
+                <p><strong>Liberi</strong> is a medical telemetry monitor built to give parents peace of mind.
+                </p>
+                <p style="margin-top: 15px;">By reading smart hardware data, the
+                    application constantly evaluates real-time vital signs against safe physiological boundaries.</p>
+                <p style="margin-top: 15px;">If readings spike abnormal or concerning, system push notifications will
+                    alert you instantly to ensure your child remains completely protected.</p>
+            </div>
 
-    <button onclick="backToDashboard()" style="background: none; border: none; cursor: pointer; margin-top: 4vh;">
-        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(90deg);">
-    </button>
-</section>
+            <button onclick="backToDashboard()"
+                style="background: none; border: none; cursor: pointer; margin-top: 4vh;">
+                <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(90deg);">
+            </button>
+        </section>
 
-<section id="age-bounds-screen" class="screen" style="padding: 60px 20px; text-align: center;">
-    <h2 style="margin-top: 6vh; font-size: 28px;">According to baby's age their levels should be:</h2>
-    
-    <div style="margin-top: 4vh auto; display: flex; flex-direction: column; gap: 3vh;">
-        <div>
-            <h2 style="font-size: 26px; margin-bottom: 3px;">Heart rate</h2>
-            <p id="targetHeart" style="font-size: 18px; color: #555; font-weight: bold;">--</p>
-        </div>
-        <div>
-            <h2 style="font-size: 26px; margin-bottom: 3px;">Temperature</h2>
-            <p id="targetTemp" style="font-size: 18px; color: #555; font-weight: bold;">36.5ºC - 37.5ºC</p>
-        </div>
-        <div>
-            <h2 style="font-size: 26px; margin-bottom: 3px;">Oxygen level</h2>
-            <p id="targetOxygen" style="font-size: 18px; color: #555; font-weight: bold;">Above 95%</p>
-        </div>
-    </div>
+        <section id="age-bounds-screen" class="screen" style="padding: 60px 20px; text-align: center;">
+<h2 id="ageBoundsHeading" style="margin-top: 6vh; font-size: 28px;">According to baby's age their levels should be:</h2>
+            <div style="margin-top: 4vh auto; display: flex; flex-direction: column; gap: 3vh;">
+                <div>
+                    <h2 style="font-size: 26px; margin-bottom: 3px;">Heart rate</h2>
+                    <p id="targetHeart" style="font-size: 18px; color: #555; font-weight: bold;">--</p>
+                </div>
+                <div>
+                    <h2 style="font-size: 26px; margin-bottom: 3px;">Temperature</h2>
+                    <p id="targetTemp" style="font-size: 18px; color: #555; font-weight: bold;">36.5ºC - 37.5ºC</p>
+                </div>
+                <div>
+                    <h2 style="font-size: 26px; margin-bottom: 3px;">Oxygen level</h2>
+                    <p id="targetOxygen" style="font-size: 18px; color: #555; font-weight: bold;">Above 95%</p>
+                </div>
+            </div>
 
-    <button onclick="backToDashboard()" style="background: none; border: none; cursor: pointer; margin-top: 4vh;">
-        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(90deg);">
-    </button>
-</section>
+            <button onclick="backToDashboard()"
+                style="background: none; border: none; cursor: pointer; margin-top: 4vh;">
+                <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(90deg);">
+            </button>
+        </section>
     </main>
 
     <script src="javascript.js"></script>
 
 </body>
+
 </html>

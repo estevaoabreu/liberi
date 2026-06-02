@@ -15,7 +15,6 @@ const oxygen = document.getElementById("oxygen");
 const pageBody = document.body;
 
 // onboarding
-
 document.addEventListener("DOMContentLoaded", () => {
   const ageSelect = document.getElementById("babyAge");
   if (ageSelect) {
@@ -32,13 +31,13 @@ function nextStep(stepNumber) {
   // nome e idade input
   if (stepNumber === 4) {
     const nameInput = document.getElementById("babyName").value.trim();
-    
+
     // tem de inserir nome
     if (nameInput === "") {
-      alert("Please enter your baby's name before moving on! ❤️");
-      return; 
+      alert("Please enter your baby's name before moving on ❤️");
+      return;
     }
-    
+
     appData.babyName = nameInput;
     const ageHeading = document.querySelector("#step-4 h2");
     if (ageHeading) {
@@ -61,7 +60,6 @@ function nextStep(stepNumber) {
     }
   }
 
-  // This part only runs if the validation check passes
   const screens = document.querySelectorAll(".screen");
   screens.forEach((screen) => {
     screen.classList.remove("active");
@@ -83,13 +81,12 @@ function setNotifications(choice) {
     });
   }
 
-  nextStep(6); // Forward user directly to dashboard
+  nextStep(6);
 }
 
-// --- ESP32 Sensor Processing Logic ---
+// logica esp32 
 
 function parseSensorLine(output) {
-  // Accept DATA lines even if there is leading/trailing noise around the payload.
   const match = output.match(
     /DATA\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(\d+)\s*,\s*(\d+)/i,
   );
@@ -145,7 +142,7 @@ function updateUI(output) {
       maxHeart = 140;
     }
     const isHeartOff = sensorData.heartrate > maxHeart || sensorData.heartrate < minHeart;
-    
+
     //sat fixa
     const isOxygenOff = sensorData.oxygen < 92;
 
@@ -156,14 +153,13 @@ function updateUI(output) {
     if (isHeartOff) { offCount++; offMetrics.push("heart rate"); }
     if (isOxygenOff) { offCount++; offMetrics.push("oxygen level"); }
 
-    // Gather Status Screen Nodes
     const statusTitle = document.getElementById("statusTitle");
     const statusDescription = document.getElementById("statusDescription");
     const statusBlob = document.getElementById("statusBlob");
     const dashboardWelcome = document.getElementById("dashboardWelcome");
     const currentName = appData.babyName || "Tommy";
 
-    // Set greeting name context
+    // nome metido
     if (dashboardWelcome) {
       dashboardWelcome.textContent = `${currentName}'s levels are...`;
     }
@@ -178,7 +174,7 @@ function updateUI(output) {
       if (statusDescription) {
         statusDescription.innerHTML = `${currentName}'s levels are <strong>unhealthy</strong>.<br>We advise you to <strong>call emergency services</strong>.`;
       }
-    } 
+    }
     else if (offCount > 0) {
       // estado abnormal: 1 ou 2 valores fora
       pageBody.classList.add("state-abnormal");
@@ -188,7 +184,7 @@ function updateUI(output) {
         let problemList = offMetrics.join(" and ");
         statusDescription.textContent = `${currentName}'s ${problemList} is currently out of normal standards.`;
       }
-    } 
+    }
     else {
       // estado normal: todos os valores dentro 
       pageBody.classList.add("state-normal");
@@ -199,7 +195,7 @@ function updateUI(output) {
       }
     }
 
-    // --- Web Notifications Logic ---
+    // logica notificacoes
     let newState = "normal";
     let alertMessage = "";
     if (offCount === 3) {
@@ -213,7 +209,7 @@ function updateUI(output) {
 
     if (newState !== "normal" && appData.notificationsEnabled && "Notification" in window && Notification.permission === "granted") {
       const now = Date.now();
-      // Notify if state just changed to a bad state, OR if it's been in a bad state for more than 2 minutes (120000ms)
+      // notificacao se estado mudou para mau ou se ficou mau durante mais de 2 minutos
       if (newState !== currentAlertState || (now - lastNotificationTime > 120000)) {
         new Notification("Liberi Monitor Alert", {
           body: alertMessage
@@ -221,7 +217,7 @@ function updateUI(output) {
         lastNotificationTime = now;
       }
     }
-    
+
     currentAlertState = newState;
 
   } else {
@@ -308,7 +304,7 @@ source.onerror = function () {
 source.onmessage = function (event) {
   let data = event.data;
 
-  // If the data is JSON-formatted (e.g. from the Wokwi/serial bridge), parse it.
+  // tirei info necessaria se tiver em json (simulador)
   if (data.startsWith("{")) {
     try {
       const parsed = JSON.parse(data);
@@ -327,25 +323,25 @@ source.onmessage = function (event) {
     temperature.textContent = "Off";
     heartrate.textContent = "Off";
     oxygen.textContent = "Off";
-    
+
     pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
-    
+
     const statusBlob = document.getElementById("statusBlob");
     const statusTitle = document.getElementById("statusTitle");
     const statusDescription = document.getElementById("statusDescription");
 
-    if (statusBlob) statusBlob.src = "assets/neutral.svg"; 
+    if (statusBlob) statusBlob.src = "assets/neutral.svg";
     if (statusTitle) statusTitle.textContent = "Connecting...";
     if (statusDescription) {
-      statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device."; 
+      statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device.";
     }
-    
+
     pageBody.style.background = `
       radial-gradient(ellipse at top, #d0d0d0, transparent),
       radial-gradient(ellipse at bottom, #73ff00, transparent)
     `;
 
-    // WIRELESS RESET VIEWS: Show the button and hide footer icons
+    // reset: mostrar botao, tirar icones
     const connectionControls = document.querySelector(".connection-controls");
     const dashboardFooter = document.querySelector(".dashboard-footer");
     if (connectionControls) connectionControls.style.display = "block";
@@ -361,10 +357,8 @@ source.onmessage = function (event) {
   }
 };
 
-// --- Footer Icon Navigation Infrastructure ---
-
+// icones baixo
 function openInfoScreen() {
-  // Hide all screens and active info layout window
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const target = document.getElementById("info-screen");
   if (target) target.classList.add("active");
@@ -372,7 +366,7 @@ function openInfoScreen() {
 
 function openAgeBoundsScreen() {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  
+
   const heading = document.getElementById("ageBoundsHeading");
   const heartDisplay = document.getElementById("targetHeart");
   const currentName = appData.babyName || "Tommy";
