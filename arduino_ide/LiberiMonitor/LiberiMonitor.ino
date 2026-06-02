@@ -2,12 +2,13 @@
 //   Liberi – Vital Sign Monitor   (Streaming Contínuo)
 // ─────────────────────────────────────────────────────────────────────────────
 
+#include "BluetoothSerial.h"
 #include "MAX30105.h"
 #include "spo2_algorithm.h"
 #include <Adafruit_MLX90614.h>
 #include <Arduino.h>
 #include <Wire.h>
-#include "BluetoothSerial.h"
+
 
 BluetoothSerial SerialBT;
 
@@ -36,8 +37,6 @@ bool lastSystemActive = false;
 volatile unsigned long lastDebounceTime = 0;
 bool bufferPrimeiroEnchimento = true; // Controla o primeiro setup de dados
 
-
-
 void setStatusColor(int r, int g, int b) {
   analogWrite(RED_PIN, r);
   analogWrite(GREEN_PIN, g);
@@ -51,20 +50,19 @@ void IRAM_ATTR toggleSystem() {
   }
 }
 
-
-
 // ────────────────────────────────────────────────────────────────────────────
 //  Setup
 // ────────────────────────────────────────────────────────────────────────────
 void setup() {
   Serial.begin(115200);
-  delay(1500); 
+  delay(1500);
 
   SerialBT.begin("Liberi_Monitor");
 
   Wire.begin(21, 22);
-  Wire.setClock(100000); 
-  Wire.setTimeOut(150); // Timeout to prevent the ESP32 from freezing if the sensor crashes!
+  Wire.setClock(100000);
+  Wire.setTimeOut(
+      150); // Timeout to prevent the ESP32 from freezing if the sensor crashes!
 
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
@@ -78,19 +76,18 @@ void setup() {
   mlx.begin();
 
   particleSensor.begin(Wire, I2C_SPEED_STANDARD);
-  Wire.setClock(100000); 
+  Wire.setClock(100000);
 
   // Configuração focada em rapidez de resposta
-  byte ledBrightness = 25; // REDUZIDO para evitar picos de corrente e crash do ESP32!
-  byte sampleAverage = 1;  // Reduzido para 1 para feedback instantâneo amostra a amostra
-  byte ledMode = 2;    
-  int sampleRate = 50; 
+  byte ledBrightness = 10; // REDUZIDO para evitar picos de corrente e crash do ESP32!
+  byte sampleAverage = 1; // Reduzido para 1 para feedback instantâneo amostra a amostra
+  byte ledMode = 2;
+  int sampleRate = 50;
   int pulseWidth = 411;
   int adcRange = 4096;
-  particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange);
+  particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate,
+                       pulseWidth, adcRange);
 
-
-  
   // Flash de sucesso
   setStatusColor(0, 255, 0);
   delay(500);
@@ -117,14 +114,24 @@ void loop() {
   }
 
   if (systemActive) {
-    // 1. Se for a primeira execução após ligar, enche o buffer inicial de 50 amostras
+    // 1. Se for a primeira execução após ligar, enche o buffer inicial de 50
+    // amostras
     if (bufferPrimeiroEnchimento) {
+      bool sensorDead = false;
       for (byte i = 0; i < BUFFER_SIZE; i++) {
         unsigned long startWait = millis();
-        while (particleSensor.available() == false) { 
-          particleSensor.check(); 
-          if (millis() - startWait > 100) break; // 100ms timeout
+        while (particleSensor.available() == false) {
+          particleSensor.check();
+          if (millis() - startWait > 100) {
+            sensorDead = true;
+            break; // 100ms timeout
+          }
         }
+
+        if (sensorDead)
+          break; // Break out of the for loop to prevent 5-second Watchdog
+                 // crash!
+
         redBuffer[i] = particleSensor.getRed();
         irBuffer[i] = particleSensor.getIR();
         particleSensor.nextSample();
@@ -141,9 +148,10 @@ void loop() {
 
     // 3. Lê a amostra mais recente para a última posição do buffer
     unsigned long startWait = millis();
-    while (particleSensor.available() == false) { 
-      particleSensor.check(); 
-      if (millis() - startWait > 100) break; // 100ms timeout
+    while (particleSensor.available() == false) {
+      particleSensor.check();
+      if (millis() - startWait > 100)
+        break; // 100ms timeout
     }
     redBuffer[BUFFER_SIZE - 1] = particleSensor.getRed();
     irBuffer[BUFFER_SIZE - 1] = particleSensor.getIR();
@@ -151,32 +159,34 @@ void loop() {
 
     // 4. Lê a temperatura (MLX90614)
     float temp = mlx.readObjectTempC();
-    if (isnan(temp)) temp = 0.0; // Fallback simples para evitar quebras de parsing no JS
+    if (isnan(temp))
+      temp = 0.0; // Fallback simples para evitar quebras de parsing no JS
 
     // 5. Corre o algoritmo com os dados atualizados (Input Constante)
     maxim_heart_rate_and_oxygen_saturation(irBuffer, BUFFER_SIZE, redBuffer,
-                                           &spo2, &validSPO2, &heartRate, &validHeartRate);
+                                           &spo2, &validSPO2, &heartRate,
+                                           &validHeartRate);
 
     int finalHR = heartRate;
     int finalSPO2 = spo2;
 
     // 6. Envia a string imediatamente para o Serial (Sem delays longos)
     char sseMsg[128];
-    snprintf(sseMsg, sizeof(sseMsg), "DATA,%.1f,%d,%d", temp, finalHR, finalSPO2);
+    snprintf(sseMsg, sizeof(sseMsg), "DATA,%.1f,%d,%d", temp, finalHR,
+             finalSPO2);
     Serial.println(sseMsg);
     SerialBT.println(sseMsg);
 
-
-
     // 7. Atualização dinâmica dos LEDs baseada nos valores lidos
     if (finalSPO2 >= 95 && finalHR >= 50 && finalHR <= 130) {
-      setStatusColor(0, 255, 0);  // Verde: Valores bons
+      setStatusColor(0, 255, 0); // Verde: Valores bons
     } else {
-      setStatusColor(255, 0, 0);  // Vermelho: Valores maus/críticos
+      setStatusColor(255, 0, 0); // Vermelho: Valores maus/críticos
     }
 
-    // Nota: Retirámos o delay(1500) do loop ativo. 
-    // Agora a velocidade do input é ditada puramente pela taxa de amostragem do sensor.
+    // Nota: Retirámos o delay(1500) do loop ativo.
+    // Agora a velocidade do input é ditada puramente pela taxa de amostragem do
+    // sensor.
   } else {
     setStatusColor(0, 0, 0);
     delay(100);
