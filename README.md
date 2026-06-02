@@ -2,12 +2,12 @@
 
 This project was developed for the "Interface Technologies" course unit of the Master's in Design and Multimedia of the Faculty of Sciences and Technology of the University of Coimbra. This project was made by Estêvão Abreu, Mariana Silva and Silas Sequeira.
 
-Liberi is a real-time baby vital sign monitoring system designed to track a baby's temperature, heart rate, and oxygen level (SpO2). The system streams this biometric data to an interactive web dashboard that features a personalized onboarding experience and dynamic status indicators (Normal, Abnormal, concerning) to alert caregivers if readings deviate from standard health thresholds.
+Liberi is a real-time baby vital sign monitoring system designed to track a baby's wrist temperature, heart rate, and oxygen level (SpO2). The system streams this biometric data directly to an interactive web dashboard via the **Web Serial API**, completely eliminating the need for complex Wi-Fi setups. The dashboard features a personalized onboarding experience, **Web Push Notifications** for emergency alerts, and dynamic status indicators to alert caregivers if readings deviate from standard age-specific health thresholds.
 
 This project supports two execution setups:
 
-1. **Physical Setup (ESP32)**: A fully wireless device utilizing an ESP32 microcontroller, physical I2C sensors, a local web server (LittleFS), and optional Node.js data forwarding.
-2. **Simulation Setup (Wokwi)**: A virtual prototype utilizing an Arduino Uno running in the Wokwi simulator with custom WebAssembly-simulated I2C sensors and a serial-to-dashboard Node.js bridge.
+1. **Physical Setup (ESP32)**: A device utilizing an ESP32 microcontroller and physical I2C sensors. It streams raw data simultaneously over a wired USB connection or wirelessly via a virtual Bluetooth Classic COM port.
+2. **Simulation Setup (Wokwi)**: A virtual prototype utilizing an Arduino Uno running in the Wokwi simulator with custom WebAssembly-simulated I2C sensors.
 
 For details on the power system, microcontroller, breadboard, and sensor connections, please refer to [circuit_diagram.md](./circuit_diagram.md).
 

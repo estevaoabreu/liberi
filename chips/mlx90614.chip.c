@@ -13,10 +13,10 @@ static uint8_t on_i2c_read(void *user_data) {
   uint32_t mode = attr_read(chip->mode_attr);
 
   switch (mode) {
-    case 0: return 36 + (rand() % 2); // Ideal (36-37°C)
-    case 1: return 38 + (rand() % 2); // Warning (38-39°C)
-    case 2: return 40 + (rand() % 3); // Critical (40-42°C)
-    default: return 37;
+    case 0: return 33 + (rand() % 2); // Ideal wrist (33-34°C)
+    case 1: return 35 + (rand() % 2); // Warning wrist (35-36°C)
+    case 2: return 37 + (rand() % 3); // Critical wrist (37-39°C)
+    default: return 34;
   }
 }
 

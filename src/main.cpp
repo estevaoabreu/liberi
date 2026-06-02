@@ -76,15 +76,8 @@ void loop() {
     Wire.requestFrom(0x57, 1);
     int rawVital2 = Wire.available() ? Wire.read() : 0;
 
-    // Map simulation temperature to healthy wrist temperature
+    // Map simulation temperature directly
     int temp = rawTemp;
-    if (rawTemp >= 36 && rawTemp <= 37) {
-      temp = rawTemp - 3; // 36-37 -> 33-34 (Healthy: 32-35)
-    } else if (rawTemp >= 38 && rawTemp <= 39) {
-      temp = rawTemp - 2; // 38-39 -> 36-37 (Warning)
-    } else if (rawTemp >= 40) {
-      temp = rawTemp - 2; // 40-42 -> 38-40 (Critical)
-    }
 
     // De-alternate vitals from MAX30102 custom chip
     int hr = 0;
@@ -112,7 +105,7 @@ void loop() {
     Serial.println(payload);
 
     // --- LOGIC FOR RGB LED STATUS ---
-    if (spo2 >= 95 && hr >= 50 && hr <= 130) {
+    if (spo2 >= 95 && hr >= 90 && hr <= 160 && temp >= 32 && temp <= 35) {
       setStatusColor(0, 255, 0);  // Green: Good values
     } else {
       setStatusColor(255, 0, 0);  // Red: Bad/Critical values

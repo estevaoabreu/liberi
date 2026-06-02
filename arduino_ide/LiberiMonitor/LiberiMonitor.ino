@@ -178,7 +178,7 @@ void loop() {
     SerialBT.println(sseMsg);
 
     // 7. Atualização dinâmica dos LEDs baseada nos valores lidos
-    if (finalSPO2 >= 95 && finalHR >= 50 && finalHR <= 130) {
+    if (finalSPO2 >= 95 && finalHR >= 90 && finalHR <= 160 && temp >= 32.0 && temp <= 35.0) {
       setStatusColor(0, 255, 0); // Verde: Valores bons
     } else {
       setStatusColor(255, 0, 0); // Vermelho: Valores maus/críticos
