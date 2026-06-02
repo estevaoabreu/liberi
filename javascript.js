@@ -96,7 +96,10 @@ function updateUI(output) {
   const sensorData = parseSensorLine(output);
   if (sensorData) {
     console.log("Parsed Sensor Data:", sensorData);
-
+const connectionControls = document.querySelector(".connection-controls");
+    const dashboardFooter = document.querySelector(".dashboard-footer");
+    if (connectionControls) connectionControls.style.display = "none";
+    if (dashboardFooter) dashboardFooter.style.display = "flex";
     pageBody.style.background = "";
 
     if (!isNaN(sensorData.temp)) {
@@ -290,9 +293,95 @@ source.onmessage = function (event) {
       radial-gradient(ellipse at top, #d0d0d0, transparent),
       radial-gradient(ellipse at bottom, #73ff00, transparent)
     `;
+
+    // WIRELESS RESET VIEWS: Show the button and hide footer icons
+    const connectionControls = document.querySelector(".connection-controls");
+    const dashboardFooter = document.querySelector(".dashboard-footer");
+    if (connectionControls) connectionControls.style.display = "block";
+    if (dashboardFooter) dashboardFooter.style.display = "none";
+    if (connectBtn) {
+      connectBtn.textContent = "Connect to ESP32";
+      connectBtn.style.backgroundColor = "#1B1B1B";
+    }
+
   } else if (data === "STATUS,ON") {
 
   } else {
     updateUI(data);
   }
+
+  // --- Footer Icon Navigation Infrastructure ---
+
+function openInfoScreen() {
+  // Hide all screens and active info layout window
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const target = document.getElementById("info-screen");
+  if (target) target.classList.add("active");
+}
+
+function openAgeBoundsScreen() {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  
+  const heading = document.getElementById("ageBoundsHeading");
+  const heartDisplay = document.getElementById("targetHeart");
+  const currentName = appData.babyName || "Tommy";
+  const ageMonths = parseInt(appData.babyAge, 10) || 1;
+
+  // Personalize the header title exactly like the mockup
+  if (heading) {
+    heading.textContent = `According to ${currentName}’s age his levels should be:`;
+  }
+
+  // Adjust thresholds depending on the month ranges specified on onboarding
+  if (heartDisplay) {
+    if (ageMonths <= 12) {
+      heartDisplay.textContent = "100 - 160 bpm (Infant standard)";
+    } else {
+      heartDisplay.textContent = "90 - 150 bpm (Toddler standard)";
+    }
+  }
+
+  const targetScreen = document.getElementById("age-bounds-screen");
+  if (targetScreen) targetScreen.classList.add("active");
+}
+
+function backToDashboard() {
+  // Safe return vector back to main live dashboard panel
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const dashboard = document.getElementById("step-6");
+  if (dashboard) dashboard.classList.add("active");
+}
+
+function refreshSystem() {
+  console.log("Refreshing system monitor variables...");
+  
+  if (temperature) temperature.textContent = "--";
+  if (heartrate) heartrate.textContent = "--";
+  if (oxygen) oxygen.textContent = "--";
+  
+  pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
+  pageBody.style.background = ""; 
+  
+  const statusBlob = document.getElementById("statusBlob");
+  const statusTitle = document.getElementById("statusTitle");
+  const statusDescription = document.getElementById("statusDescription");
+
+  if (statusBlob) statusBlob.src = "assets/neutral.svg";
+  if (statusTitle) statusTitle.textContent = "Connecting...";
+  if (statusDescription) {
+    statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device.";
+  }
+
+  // SWAP VIEWS BACK: Show connect button container and hide footer navigation icons
+  const connectionControls = document.querySelector(".connection-controls");
+  const dashboardFooter = document.querySelector(".dashboard-footer");
+  if (connectionControls) connectionControls.style.display = "block";
+  if (dashboardFooter) dashboardFooter.style.display = "none";
+
+  // Reset the connect button text and color back to your default styling
+  if (connectBtn) {
+    connectBtn.textContent = "Connect to ESP32";
+    connectBtn.style.backgroundColor = "#1B1B1B";
+  }
+}
 };

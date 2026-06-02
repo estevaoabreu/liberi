@@ -49,6 +49,7 @@
             </div>
             <p>Liberi uses notifications to alert you in case your baby's levels are below or above average.</p>
         </section>
+
 <section id="step-6" class="screen">
     <h3 id="dashboardWelcome">Tommy's levels are...</h3>
 
@@ -74,10 +75,64 @@
     </div>
 
     <div class="connection-controls" style="margin-top: 4vh;">
-        <button id="connectBtn">Connect to ESP32</button>
+        <!-- UPDATED: Changed color to #1B1B1B black and matching pill styling -->
+        <button id="connectBtn" style="background-color: #1B1B1B; color: white; border-radius: 25px; padding: 10px 24px; border: none; font-family: inherit; font-weight: bold; cursor: pointer;">Connect to ESP32</button>
+    </div>
+
+    <!-- UPDATED: Set display to none initially so it doesn't show up on the connecting screen -->
+    <div class="dashboard-footer" style="display: none; justify-content: center; gap: 40px; margin-top: 4vh; padding-bottom: 2vh;">
+        <!-- Left: Info Button -->
+        <button onclick="openInfoScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
+            <img src="assets/info.svg" alt="Information" style="width: 32px; height: 32px;">
+        </button>
+        
+        <!-- Middle: Refresh Button -->
+        <button onclick="refreshSystem()" style="background: none; border: none; padding: 0; cursor: pointer;">
+            <img src="assets/refresh.svg" alt="Refresh" style="width: 32px; height: 32px;">
+        </button>
+        
+        <!-- Right: Range/Age Bounds Button -->
+        <button onclick="openAgeBoundsScreen()" style="background: none; border: none; padding: 0; cursor: pointer;">
+            <img src="assets/range.svg" alt="Age Ranges" style="width: 32px; height: 32px;">
+        </button>
     </div>
 </section>
 
+
+<section id="info-screen" class="screen" style="padding: 40px 20px; text-align: center;">
+    <h2 style="margin-top: 5vh; font-size: 28px;">About Liberi</h2>
+    <div style="margin: 4vh auto; max-width: 85%; text-align: left; line-height: 1.6; font-size: 16px; color: #333;">
+        <p><strong>Liberi</strong> is an advanced medical telemetry monitor built to give parents peace of mind.</p>
+        <p style="margin-top: 15px;">By reading smart hardware data over Web Serial or wireless nodes, the application constantly evaluates real-time vital signs against safe physiological boundaries.</p>
+        <p style="margin-top: 15px;">If readings spike abnormal or concerning, system push notifications will alert you instantly to ensure your child remains completely protected.</p>
+    </div>
+    <button onclick="backToDashboard()" style="background: none; border: none; cursor: pointer; margin-top: 5vh;">
+        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px; transform: rotate(180deg);">
+    </button>
+</section>
+
+<section id="age-bounds-screen" class="screen" style="padding: 40px 20px; text-align: center;">
+    <h3 id="ageBoundsHeading" style="font-weight: normal; font-size: 20px; margin-top: 4vh; padding: 0 15px; line-height: 1.4;">According to baby's age his levels should be:</h3>
+    
+    <div style="margin-top: 6vh; display: flex; flex-direction: column; gap: 5vh;">
+        <div>
+            <h2 style="font-size: 26px; margin-bottom: 5px;">Heart rate</h2>
+            <p id="targetHeart" style="font-size: 18px; color: #555; font-weight: bold;">--</p>
+        </div>
+        <div>
+            <h2 style="font-size: 26px; margin-bottom: 5px;">Temperature</h2>
+            <p id="targetTemp" style="font-size: 18px; color: #555; font-weight: bold;">36.5ºC - 37.5ºC</p>
+        </div>
+        <div>
+            <h2 style="font-size: 26px; margin-bottom: 5px;">Oxygen level</h2>
+            <p id="targetOxygen" style="font-size: 18px; color: #555; font-weight: bold;">Above 95%</p>
+        </div>
+    </div>
+
+    <button onclick="backToDashboard()" style="background: none; border: none; cursor: pointer; margin-top: 8vh;">
+        <img src="assets/seta.svg" alt="Back" style="width: 40px; height: 40px;">
+    </button>
+</section>
     </main>
 
     <script src="javascript.js"></script>
