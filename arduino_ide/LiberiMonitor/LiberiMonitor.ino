@@ -34,7 +34,7 @@ int8_t validHeartRate;
 // ── System states ───────────────────────────────────────────────────────────
 volatile bool systemActive = false;
 bool lastSystemActive = false;
-unsigned long lastDebounceTime = 0;
+volatile unsigned long lastDebounceTime = 0;
 bool bufferPrimeiroEnchimento = true; // Controla o primeiro setup de dados
 
 
@@ -120,7 +120,11 @@ void loop() {
     // 1. Se for a primeira execução após ligar, enche o buffer inicial de 50 amostras
     if (bufferPrimeiroEnchimento) {
       for (byte i = 0; i < BUFFER_SIZE; i++) {
-        while (particleSensor.available() == false) { particleSensor.check(); }
+        unsigned long startWait = millis();
+        while (particleSensor.available() == false) { 
+          particleSensor.check(); 
+          if (millis() - startWait > 100) break; // 100ms timeout
+        }
         redBuffer[i] = particleSensor.getRed();
         irBuffer[i] = particleSensor.getIR();
         particleSensor.nextSample();
@@ -136,7 +140,11 @@ void loop() {
     }
 
     // 3. Lê a amostra mais recente para a última posição do buffer
-    while (particleSensor.available() == false) { particleSensor.check(); }
+    unsigned long startWait = millis();
+    while (particleSensor.available() == false) { 
+      particleSensor.check(); 
+      if (millis() - startWait > 100) break; // 100ms timeout
+    }
     redBuffer[BUFFER_SIZE - 1] = particleSensor.getRed();
     irBuffer[BUFFER_SIZE - 1] = particleSensor.getIR();
     particleSensor.nextSample();

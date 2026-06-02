@@ -48,9 +48,7 @@ const server = http.createServer((req, res) => {
     parser.on("data", (line) => {
       const trimmed = line.trim();
       if (trimmed) {
-        res.write(
-          `data: ${JSON.stringify({ type: "wokwi", content: trimmed })}\n\n`,
-        );
+        res.write(`data: ${trimmed}\n\n`);
       }
     });
 
@@ -90,6 +88,9 @@ const server = http.createServer((req, res) => {
         break;
       case ".jpg":
         contentType = "image/jpg";
+        break;
+      case ".svg":
+        contentType = "image/svg+xml";
         break;
     }
 

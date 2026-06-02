@@ -59,7 +59,7 @@ This setup runs a simulated Arduino Uno inside the Wokwi simulator interface. Se
 
 ## Setup Variation 2: Physical Device (ESP32)
 
-This setup deploys a multi-threaded C++ firmware onto a physical ESP32 microcontroller that streams sensor readings wirelessly over Wi-Fi or directly via USB.
+This setup deploys a C++ firmware onto a physical ESP32 microcontroller that streams sensor readings to your browser dashboard directly via **USB-C** or wirelessly via **Bluetooth Classic**.
 
 ### Hardware Architecture & Wiring
 
@@ -77,54 +77,33 @@ The physical device uses an ESP-32D, real sensors, a push button, and an RGB LED
 1. **Arduino IDE** (v2.0+) or VS Code with the PlatformIO extension.
 2. **ESP32 Board Package** installed in Arduino IDE (`https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`).
 3. Installed Arduino Libraries:
-   - **ESPAsyncWebServer** and **AsyncTCP** (for hosting the web server and SSE streams)
    - **Adafruit MLX90614 Library**
    - **SparkFun MAX3010x Pulse and Proximity Sensor Library**
 
-### Installation & Configuration
+### Installation & Uploading
 
 1. Open the [arduino_ide/LiberiMonitor](./arduino_ide/LiberiMonitor) directory.
-2. Copy `secrets.h.example` to `secrets.h` inside the `LiberiMonitor` directory:
-   ```bash
-   cp secrets.h.example secrets.h
-   ```
-3. Open `secrets.h` and configure:
-   ```cpp
-   #define WIFI_SSID "YOUR_WIFI_SSID"
-   #define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
-   #define LOCAL_SERVER_HOST "YOUR_PC_LOCAL_IP_ADDRESS" // e.g., "192.168.1.15"
-   ```
-
-### Uploading Code and Assets
-
-1. **Upload Sketch**: Open [LiberiMonitor.ino](./arduino_ide/LiberiMonitor/LiberiMonitor.ino) in Arduino IDE, select your ESP32 board model (e.g., `ESP32 Dev Module`) and port, and click **Upload**.
-2. **Upload LittleFS Filesystem Data**:
-   - The ESP32 serves the dashboard locally from its internal storage using LittleFS.
-   - Place the compiled static web files (or copy the files from `arduino_ide/LiberiMonitor/data/`) into the `data` folder.
-   - Use the **ESP32 Sketch Data Upload** tool in Arduino IDE (or equivalent CLI command) to compile the LittleFS partition and flash it to the ESP32.
+2. Open `LiberiMonitor.ino` in Arduino IDE.
+3. Select your ESP32 board model (e.g., `ESP32 Dev Module`) and the appropriate COM port.
+4. Click **Upload** to flash the firmware.
 
 ### Running & Dashboard Modes
 
-Once uploaded, press the push button on GPIO 17 to start monitoring. You have three ways to view the dashboard:
+Once uploaded, press the push button on GPIO 17 to start monitoring. The firmware streams data simultaneously over physical USB and virtual Bluetooth Serial.
 
-#### Mode A: Standalone Wireless Web Server (No PC Server Required)
+To view the dashboard, you simply need to open `index.html` in a supported browser (Chrome or Edge) or serve it locally using Node (`node server.js` -> `http://localhost:3000`).
 
-- The ESP32 hosts its own web server on port 80.
-- When connected to your local Wi-Fi, it prints its assigned IP address to the Serial monitor. Open that IP (e.g., `http://192.168.1.50/`) in your browser.
-- **AP Fallback Mode**: If Wi-Fi fails to connect, the ESP32 hosts its own Access Point named `LiberiMonitor` (password: `12345678`). Connect your phone or PC to this Wi-Fi network and open `http://192.168.4.1/`.
+#### Mode A: Wireless Bluetooth Connection (Recommended)
 
-#### Mode B: Local Node.js Hub (Recommended)
+1. On your PC/Mac, open your OS **Bluetooth Settings** and pair with the device named **`Liberi_Monitor`**.
+2. Once paired, your OS will assign it a virtual serial COM port.
+3. Open the dashboard in Chrome/Edge.
+4. Click the **"Connect to ESP32"** button.
+5. Select the newly created Bluetooth COM port from the browser's pairing dialog to start the wireless stream.
 
-1. On your PC, navigate to the project root and start the Node.js server:
-   ```bash
-   node server.js
-   ```
-2. Open `http://localhost:3000` in your web browser.
-3. The ESP32 will parse and process vitals, then make asynchronous POST requests to `http://<your-pc-ip>:3000/api/data`, which is forwarded to the browser dashboard via Server-Sent Events (SSE).
+#### Mode B: Wired USB Connection
 
-#### Mode C: Web Serial Direct Connection (Browser Serial)
-
-1. Connect the ESP32 to your PC using a USB cable.
-2. Open the dashboard (from your local Node.js server, ESP32 local server, or simply opening `index.html` in Chrome/Edge).
-3. Click the **"Connect to ESP32"** button on the dashboard interface.
-4. Select the serial port assigned to your ESP32. The dashboard will process raw serial telemetry lines directly.
+1. Keep the ESP32 connected to your PC using the USB-C cable.
+2. Open the dashboard in Chrome/Edge.
+3. Click the **"Connect to ESP32"** button.
+4. Select the physical USB COM port assigned to your ESP32 to start the wired stream.
