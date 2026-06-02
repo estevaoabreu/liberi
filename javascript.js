@@ -30,10 +30,10 @@ function nextStep(stepNumber) {
   if (stepNumber === 4) {
     const nameInput = document.getElementById("babyName").value.trim();
     
-    // VALIDATION POP-UP: Check if the name field is empty
+    // tem de inserir nome
     if (nameInput === "") {
       alert("Please enter your baby's name before moving on! ❤️");
-      return; // Stops the function right here, preventing the screen change!
+      return; 
     }
     
     appData.babyName = nameInput;
@@ -47,6 +47,14 @@ function nextStep(stepNumber) {
     const ageSelect = document.getElementById("babyAge");
     if (ageSelect) {
       appData.babyAge = ageSelect.value;
+    }
+  }
+
+  // update nome antes de recolher dados
+  if (stepNumber === 6) {
+    const dashboardWelcome = document.getElementById("dashboardWelcome");
+    if (dashboardWelcome) {
+      dashboardWelcome.textContent = `${appData.babyName}'s levels are...`;
     }
   }
 
@@ -133,12 +141,10 @@ function updateUI(output) {
       dashboardWelcome.textContent = `${currentName}'s levels are...`;
     }
 
-    // Flush old custom background engine flags
     pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
 
-    // 3. Three-Tier State Machine Router
     if (offCount === 3) {
-      // CONCERNING STATE: All values are completely off
+      // estado concerning: 3 valores fora da normalidade
       pageBody.classList.add("state-concerning");
       if (statusTitle) statusTitle.textContent = "Concerning";
       if (statusBlob) statusBlob.src = "assets/concerning.svg";
@@ -147,7 +153,7 @@ function updateUI(output) {
       }
     } 
     else if (offCount > 0) {
-      // ABNORMAL STATE: One or two values are outside normal profiles
+      // estado abnormal: 1 ou 2 valores fora
       pageBody.classList.add("state-abnormal");
       if (statusTitle) statusTitle.textContent = "Abnormal";
       if (statusBlob) statusBlob.src = "assets/abnormal.svg";
@@ -157,7 +163,7 @@ function updateUI(output) {
       }
     } 
     else {
-      // NORMAL STATE: Tracking clean data lines
+      // estado normal: todos os valores dentro 
       pageBody.classList.add("state-normal");
       if (statusTitle) statusTitle.textContent = "Normal";
       if (statusBlob) statusBlob.src = "assets/normal.svg";
@@ -170,7 +176,6 @@ function updateUI(output) {
   }
 }
 
-// --- Web Serial API Streams Architecture ---
 
 let port;
 let reader;
@@ -275,7 +280,7 @@ source.onmessage = function (event) {
     const statusTitle = document.getElementById("statusTitle");
     const statusDescription = document.getElementById("statusDescription");
 
-    if (statusBlob) statusBlob.src = "assets/happy.svg"; 
+    if (statusBlob) statusBlob.src = "assets/neutral.svg"; 
     if (statusTitle) statusTitle.textContent = "Connecting...";
     if (statusDescription) {
       statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device."; 
