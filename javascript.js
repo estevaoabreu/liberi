@@ -76,7 +76,7 @@ function setNotifications(choice) {
   console.log("Onboarding complete. Collected Data:", appData);
 
   if (choice && "Notification" in window) {
-    Notification.requestPermission().then(permission => {
+    Notification.requestPermission().then((permission) => {
       console.log("Notification permission:", permission);
     });
   }
@@ -84,7 +84,7 @@ function setNotifications(choice) {
   nextStep(6);
 }
 
-// logica esp32 
+// logica esp32
 
 function parseSensorLine(output) {
   const match = output.match(
@@ -127,7 +127,7 @@ function updateUI(output) {
       oxygen.textContent = "N/A";
     }
     // temp fixa
-    const isTempOff = sensorData.temp > 38 || sensorData.temp < 35;
+    const isTempOff = sensorData.temp > 38 || sensorData.temp < 29;
 
     //bpm dinamico dependente da idade
     const ageMonths = parseInt(appData.babyAge, 10) || 1;
@@ -141,7 +141,8 @@ function updateUI(output) {
       minHeart = 65;
       maxHeart = 140;
     }
-    const isHeartOff = sensorData.heartrate > maxHeart || sensorData.heartrate < minHeart;
+    const isHeartOff =
+      sensorData.heartrate > maxHeart || sensorData.heartrate < minHeart;
 
     //sat fixa
     const isOxygenOff = sensorData.oxygen < 92;
@@ -149,9 +150,18 @@ function updateUI(output) {
     let offCount = 0;
     let offMetrics = [];
 
-    if (isTempOff) { offCount++; offMetrics.push("temperature"); }
-    if (isHeartOff) { offCount++; offMetrics.push("heart rate"); }
-    if (isOxygenOff) { offCount++; offMetrics.push("oxygen level"); }
+    if (isTempOff) {
+      offCount++;
+      offMetrics.push("temperature");
+    }
+    if (isHeartOff) {
+      offCount++;
+      offMetrics.push("heart rate");
+    }
+    if (isOxygenOff) {
+      offCount++;
+      offMetrics.push("oxygen level");
+    }
 
     const statusTitle = document.getElementById("statusTitle");
     const statusDescription = document.getElementById("statusDescription");
@@ -164,22 +174,25 @@ function updateUI(output) {
       dashboardWelcome.textContent = `${currentName}'s levels are...`;
     }
 
-    pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
+    pageBody.classList.remove(
+      "state-normal",
+      "state-abnormal",
+      "state-concerning",
+    );
 
     if (offCount === 3) {
-  // estado concerning: 3 valores fora da normalidade
-  pageBody.classList.add("state-concerning");
-  if (statusTitle) statusTitle.textContent = "Concerning";
-  if (statusBlob) statusBlob.src = "assets/concerning.svg";
-  
-  if (statusDescription) {
-    statusDescription.innerHTML = `
+      // estado concerning: 3 valores fora da normalidade
+      pageBody.classList.add("state-concerning");
+      if (statusTitle) statusTitle.textContent = "Concerning";
+      if (statusBlob) statusBlob.src = "assets/concerning.svg";
+
+      if (statusDescription) {
+        statusDescription.innerHTML = `
       ${currentName}'s levels are <strong>unhealthy</strong>.<br>
       We advise you to <a href="tel:112" style="color: inherit; text-decoration: underline; font-weight: bold;">call emergency services</a>.
     `;
-  }
-}
-    else if (offCount > 0) {
+      }
+    } else if (offCount > 0) {
       // estado abnormal: 1 ou 2 valores fora
       pageBody.classList.add("state-abnormal");
       if (statusTitle) statusTitle.textContent = "Abnormal";
@@ -188,9 +201,8 @@ function updateUI(output) {
         let problemList = offMetrics.join(" and ");
         statusDescription.textContent = `${currentName}'s ${problemList} is currently out of normal standards.`;
       }
-    }
-    else {
-      // estado normal: todos os valores dentro 
+    } else {
+      // estado normal: todos os valores dentro
       pageBody.classList.add("state-normal");
       if (statusTitle) statusTitle.textContent = "Normal";
       if (statusBlob) statusBlob.src = "assets/normal.svg";
@@ -211,24 +223,30 @@ function updateUI(output) {
       alertMessage = `${currentName}'s ${problemList} is currently out of normal standards.`;
     }
 
-    if (newState !== "normal" && appData.notificationsEnabled && "Notification" in window && Notification.permission === "granted") {
+    if (
+      newState !== "normal" &&
+      appData.notificationsEnabled &&
+      "Notification" in window &&
+      Notification.permission === "granted"
+    ) {
       const now = Date.now();
       // notificacao se estado mudou para mau ou se ficou mau durante mais de 2 minutos
-      if (newState !== currentAlertState || (now - lastNotificationTime > 120000)) {
+      if (
+        newState !== currentAlertState ||
+        now - lastNotificationTime > 120000
+      ) {
         new Notification("Liberi Monitor Alert", {
-          body: alertMessage
+          body: alertMessage,
         });
         lastNotificationTime = now;
       }
     }
 
     currentAlertState = newState;
-
   } else {
     console.log("System Status:", output);
   }
 }
-
 
 let port;
 let reader;
@@ -298,12 +316,9 @@ if (connectBtn) {
 
 const source = new EventSource("/events");
 
-source.onopen = function () {
+source.onopen = function () {};
 
-};
-
-source.onerror = function () {
-};
+source.onerror = function () {};
 
 source.onmessage = function (event) {
   let data = event.data;
@@ -328,7 +343,11 @@ source.onmessage = function (event) {
     heartrate.textContent = "Off";
     oxygen.textContent = "Off";
 
-    pageBody.classList.remove("state-normal", "state-abnormal", "state-concerning");
+    pageBody.classList.remove(
+      "state-normal",
+      "state-abnormal",
+      "state-concerning",
+    );
 
     const statusBlob = document.getElementById("statusBlob");
     const statusTitle = document.getElementById("statusTitle");
@@ -337,7 +356,8 @@ source.onmessage = function (event) {
     if (statusBlob) statusBlob.src = "assets/neutral.svg";
     if (statusTitle) statusTitle.textContent = "Connecting...";
     if (statusDescription) {
-      statusDescription.innerHTML = "Please click the button below<br>to pair your monitor device.";
+      statusDescription.innerHTML =
+        "Please click the button below<br>to pair your monitor device.";
     }
 
     pageBody.style.background = `
@@ -355,7 +375,6 @@ source.onmessage = function (event) {
       connectBtn.style.backgroundColor = "#1B1B1B";
     }
   } else if (data === "STATUS,ON") {
-
   } else {
     updateUI(data);
   }
@@ -363,13 +382,17 @@ source.onmessage = function (event) {
 
 // icones baixo
 function openInfoScreen() {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document
+    .querySelectorAll(".screen")
+    .forEach((s) => s.classList.remove("active"));
   const target = document.getElementById("info-screen");
   if (target) target.classList.add("active");
 }
 
 function openAgeBoundsScreen() {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document
+    .querySelectorAll(".screen")
+    .forEach((s) => s.classList.remove("active"));
 
   const heading = document.getElementById("ageBoundsHeading");
   const heartDisplay = document.getElementById("targetHeart");
@@ -396,7 +419,9 @@ function openAgeBoundsScreen() {
 }
 
 function backToDashboard() {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document
+    .querySelectorAll(".screen")
+    .forEach((s) => s.classList.remove("active"));
   const dashboard = document.getElementById("step-6");
   if (dashboard) dashboard.classList.add("active");
 }
