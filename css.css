@@ -1,197 +1,213 @@
 html {
-    font-family: 'DM Sans', sans-serif;
-    color: #202020;
+  font-family: "DM Sans", sans-serif;
+  color: #202020;
 }
 
 body {
-    overflow: hidden;
-    text-align: center;
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(162, 221, 215, 1) 100%);
+  overflow: hidden;
+  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(162, 221, 215, 1) 100%
+  );
 }
 
 h1 {
-    font-size: 4em;
-    margin: 0;
-    font-weight: 700;
+  font-size: 4em;
+  margin: 0;
+  font-weight: 700;
 }
 
 h2 {
-    font-size: 2.2em;
-    font-weight: 400;
+  font-size: 2.2em;
+  font-weight: 400;
 }
 
 p {
-    font-size: 1em;
-    color: #404040;
+  font-size: 1em;
+  color: #404040;
 }
 
 .screen {
-    display: none;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center;    
-    box-sizing: border-box;
-    padding: 30px;
-    height: 100vh;          
-    width: 100%;           
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 30px;
+  height: 100vh;
+  width: 100%;
 }
 
 .screen.active {
-    display: flex;
+  display: flex;
 }
 
 input,
 select {
-    padding: 12px 20px;
-    margin: 20px 0;
-    border-radius: 25px;
-    border: 1.5px solid #202020;
-    font-family: inherit;
-    font-size: 1rem;
-    width: 80%;
-    max-width: 280px;
-    text-align: center;
-    outline: none;
-    background: transparent;
+  padding: 12px 20px;
+  margin: 20px 0;
+  border-radius: 25px;
+  border: 1.5px solid #202020;
+  font-family: inherit;
+  font-size: 1rem;
+  width: 80%;
+  max-width: 280px;
+  text-align: center;
+  outline: none;
+  background: transparent;
 }
 
 select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    cursor: pointer;
-    text-align: center;
-    text-align-last: center;
-    background-image: url("assets/seta.svg");
-    background-repeat: no-repeat;
-    background-size: 14px;
-    background-position: right 24px center;
-    padding-right: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  text-align: center;
+  text-align-last: center;
+  background-image: url("assets/seta.svg");
+  background-repeat: no-repeat;
+  background-size: 14px;
+  background-position: right 24px center;
+  padding-right: 40px;
 }
 
 select:-moz-focusring {
-    color: transparent;
-    text-shadow: 0 0 0 #202020;
+  color: transparent;
+  text-shadow: 0 0 0 #202020;
 }
 
 button {
-    padding: 12px 20px;
-    border-radius: 25px;
-    border: 1.5px solid #202020;
-    background: transparent;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: all 0.2s ease;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: 1.5px solid #202020;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
 }
 
 button:hover {
-    background-color: #202020;
-    color: white;
+  background-color: #202020;
+  color: white;
 }
 
 .button-group {
-    display: flex;
-    gap: 15px;
-    margin: 20px 0;
+  display: flex;
+  gap: 15px;
+  margin: 20px 0;
 }
 
 .hint {
-    font-size: 0.9em;
-    opacity: 0.5;
+  font-size: 0.9em;
+  opacity: 0.5;
 }
 
 .metrics-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    width: 100%;
-    max-width: 500px;
-    margin-top: 5vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 5vh;
 }
 
 .metric-box {
-    width: 33%;
-    flex-shrink: 1;
+  width: 33%;
+  flex-shrink: 1;
 }
 
 .metric-box h2 {
-    font-size: 3.5em;
-    font-weight: 200;
-    margin: 0;
+  font-size: 3.5em;
+  font-weight: 200;
+  margin: 0;
 }
 
 .metric-box p {
-    font-size: 0.9em;
-    margin-top: 5px;
+  font-size: 0.9em;
+  margin-top: 5px;
 }
 
 #connectBtn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* State Background Environments */
 body.state-normal {
-    background: radial-gradient(circle at center, #ffffff 0%, #b2e7a1 100%);
-    color: #1b4314;
+  background: radial-gradient(circle at center, #ffffff 0%, #b2e7a1 100%);
+  color: #1b4314;
 }
 
 body.state-abnormal {
-    background: radial-gradient(circle at center, #ffffff 0%, #fbe79a 100%);
-    color: #4a3b05;
+  background: radial-gradient(circle at center, #ffffff 0%, #fbe79a 100%);
+  color: #4a3b05;
 }
 
 body.state-concerning {
-    background: radial-gradient(circle at center, #ffffff 0%, #fca2a2 100%);
-    color: #5c0909;
+  background: radial-gradient(circle at center, #ffffff 0%, #fca2a2 100%);
+  color: #5c0909;
 }
 
 .status-display-area {
-    margin-top: 4vh;
+  margin-top: 4vh;
 }
 
 #statusTitle {
-    font-size: 2.5em;
-    margin: 15px 0 5px 0;
-    font-weight: 700;
+  font-size: 2.5em;
+  margin: 15px 0 5px 0;
+  font-weight: 700;
 }
 
 #statusDescription {
-    font-size: 1.1em;
-    margin-top: 0;
-    max-width: 320px;
-    display: inline-block;
-    line-height: 1.4;
+  font-size: 1.1em;
+  margin-top: 0;
+  max-width: 320px;
+  display: inline-block;
+  line-height: 1.4;
 }
 
 #dashboardWelcome {
-    font-size: 1.2em;
-    margin-bottom: 2vh;
-    opacity: 0.85;
+  font-size: 1.2em;
+  margin-bottom: 2vh;
+  opacity: 0.85;
 }
 
 .blob-character {
-    width: 160px;
-    height: auto;
-    margin: 3vh auto 1vh;
-    display: block;
-    transition: transform 0.3s ease;
+  width: 160px;
+  height: auto;
+  margin: 3vh auto 1vh;
+  display: block;
+  transition: transform 0.3s ease;
 }
 
 body.state-concerning .blob-character {
-    animation: gentlePulse 2s infinite ease-in-out;
+  animation: gentlePulse 2s infinite ease-in-out;
 }
 
 @keyframes gentlePulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#temperature,
+#heartrate,
+#oxygen {
+  font-size: 3.5em;
 }
