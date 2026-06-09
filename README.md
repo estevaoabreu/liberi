@@ -6,7 +6,7 @@ This project was developed for the "Interface Technologies" course unit of the M
 
 ---
 
-## 🌟 Features
+## Features
 
 - **Real-time Monitoring**: Live tracking of temperature, heart rate, and oxygen levels.
 - **Dynamic Age-based Thresholds**: Automatic adjustment of normal heart rate zones based on the baby's age in months.
